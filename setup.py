@@ -23,6 +23,10 @@ install_requires = [
     'uritemplate'
 ]
 
+# For aiohttp extra
+aiohttp_requires = [
+    'aiohttp'
+]
 
 # Test dependencies
 tests_require = [
@@ -40,7 +44,9 @@ docs_require = [
 # Optional dependencies (like for dev)
 extras_require = {
     # For development environments
-    'dev': tests_require + docs_require
+    'dev': tests_require + docs_require + aiohttp_requires,
+
+    'aiohttp': aiohttp_requires
 }
 
 # Setup-time dependencies
