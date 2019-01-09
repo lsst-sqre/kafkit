@@ -7,6 +7,8 @@ import pytest
 
 from kafkit.registry.sansio import (make_headers, decipher_response,
                                     RegistryApi)
+from kafkit.registry.errors import (
+    RegistryRedirectionError, RegistryBadRequestError, RegistryBrokenError)
 
 
 def test_make_headers():
@@ -36,13 +38,72 @@ def test_decipher_response_200_empty():
     assert returned_data is None
 
 
-def test_decipher_response_500():
+def test_decipher_response_500_no_message():
     status = 500
     headers = {
         "content-type": "application/vnd.schemaregistry.v1+json"
     }
     body = b""
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RegistryBrokenError):
+        decipher_response(status, headers, body)
+
+
+def test_decipher_response_500_with_message():
+    status = 500
+    headers = {
+        "content-type": "application/vnd.schemaregistry.v1+json"
+    }
+    body = json.dumps({
+        'error': 12345,
+        'message': "I've got reasons"
+    }).encode('utf-8')
+    with pytest.raises(RegistryBrokenError):
+        decipher_response(status, headers, body)
+
+
+def test_decipher_response_401_no_message():
+    status = 401
+    headers = {
+        "content-type": "application/vnd.schemaregistry.v1+json"
+    }
+    body = b""
+    with pytest.raises(RegistryBadRequestError):
+        decipher_response(status, headers, body)
+
+
+def test_decipher_response_401_with_message():
+    status = 401
+    headers = {
+        "content-type": "application/vnd.schemaregistry.v1+json"
+    }
+    body = json.dumps({
+        'error': 12345,
+        'message': "I've got reasons"
+    }).encode('utf-8')
+    with pytest.raises(RegistryBadRequestError):
+        decipher_response(status, headers, body)
+
+
+def test_decipher_response_301_no_message():
+    status = 301
+    headers = {
+        "content-type": "application/vnd.schemaregistry.v1+json"
+    }
+    body = b""
+    with pytest.raises(RegistryRedirectionError):
+        decipher_response(status, headers, body)
+
+
+def test_decipher_response_301_with_message():
+    status = 301
+    headers = {
+        "content-type": "application/vnd.schemaregistry.v1+json"
+    }
+    body = json.dumps({
+        'error': 12345,
+        'message': "I've got reasons"
+    }).encode('utf-8')
+    with pytest.raises(RegistryRedirectionError):
         decipher_response(status, headers, body)
 
 

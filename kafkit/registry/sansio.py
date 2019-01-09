@@ -13,6 +13,9 @@ import json
 import logging
 
 from kafkit.httputils import format_url, parse_content_type
+from kafkit.registry.errors import (
+    RegistryRedirectionError, RegistryBadRequestError, RegistryBrokenError,
+    RegistryHttpError)
 
 
 def make_headers():
@@ -34,11 +37,31 @@ def decipher_response(status_code, headers, body):
     """Process a response.
     """
     data = decode_body(headers.get("content-type"), body)
-    if status_code < 300:
+
+    if status_code in (200, 201, 204):
         return data
     else:
-        # TODO implement a real exception hierarchy
-        raise RuntimeError(f'Got registry status code {status_code}')
+        # Process an error. First try to get the error message from the
+        # response and then raise an appropriate exception.
+        try:
+            error_code = data['error_code']
+            message = data['message']
+        except (TypeError, KeyError):
+            error_code = None
+            message = None
+
+        if status_code >= 500:
+            raise RegistryBrokenError(
+                status_code=status_code, error_code=error_code,
+                message=message)
+        elif status_code >= 400:
+            raise RegistryBadRequestError(
+                status_code=status_code, error_code=error_code,
+                message=message)
+        elif status_code >= 300:
+            raise RegistryRedirectionError(status_code=status_code)
+        else:
+            raise RegistryHttpError(status_code=status_code)
 
 
 def decode_body(content_type, body):
