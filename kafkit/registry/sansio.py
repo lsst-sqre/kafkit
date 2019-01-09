@@ -135,18 +135,171 @@ class RegistryApi(abc.ABC):
         return response_data
 
     async def get(self, url, url_vars=dict()):
+        """Send an HTTP GET request.
+
+        Parameters
+        ----------
+        url : `str`
+            The endpoint path, usually relative to the ``host`` attribute
+            (an absolute URL is also okay). The url can be templated
+            (``/a{/b}/c``, where ``b`` is a variable).
+        url_vars : `dict`, optional
+            A dictionary of variable names and values to expand the templated
+            ``url`` parameter.
+
+        Returns
+        -------
+        data
+            The response body. If the response is JSON, the data is parsed
+            into a Python object.
+
+        Raises
+        ------
+        kafkit.registry.RegistryRedirectionError
+            Raised if the server returns a 3XX status.
+        kafkit.registry.RegistryRadRequestError
+            Raised if the server returns a 4XX status because the request
+            is incorrect, not authenticated, or not authorized.
+        kafkit.registry.RegistryBrokenError
+            Raised if the server returns a 5XX status because something is
+            wrong with the server itself.
+        """
         data = await self._make_request("GET", url, url_vars, b"")
         return data
 
     async def post(self, url, url_vars=dict(), *, data):
+        """Send an HTTP POST request.
+
+        Parameters
+        ----------
+        url : `str`
+            The endpoint path, usually relative to the ``host`` attribute
+            (an absolute URL is also okay). The url can be templated
+            (``/a{/b}/c``, where ``b`` is a variable).
+        url_vars : `dict`, optional
+            A dictionary of variable names and values to expand the templated
+            ``url`` parameter.
+        data : object
+            The body of the request as a JSON-serializable object.
+
+        Returns
+        -------
+        data
+            The response body. If the response is JSON, the data is parsed
+            into a Python object.
+
+        Raises
+        ------
+        kafkit.registry.RegistryRedirectionError
+            Raised if the server returns a 3XX status.
+        kafkit.registry.RegistryRadRequestError
+            Raised if the server returns a 4XX status because the request
+            is incorrect, not authenticated, or not authorized.
+        kafkit.registry.RegistryBrokenError
+            Raised if the server returns a 5XX status because something is
+            wrong with the server itself.
+        """
         data = await self._make_request("POST", url, url_vars, data)
         return data
 
     async def patch(self, url, url_vars=dict(), *, data):
+        """Send an HTTP PATCH request.
+
+        Parameters
+        ----------
+        url : `str`
+            The endpoint path, usually relative to the ``host`` attribute
+            (an absolute URL is also okay). The url can be templated
+            (``/a{/b}/c``, where ``b`` is a variable).
+        url_vars : `dict`, optional
+            A dictionary of variable names and values to expand the templated
+            ``url`` parameter.
+        data : object
+            The body of the request as a JSON-serializable object.
+
+        Returns
+        -------
+        data
+            The response body. If the response is JSON, the data is parsed
+            into a Python object.
+
+        Raises
+        ------
+        kafkit.registry.RegistryRedirectionError
+            Raised if the server returns a 3XX status.
+        kafkit.registry.RegistryRadRequestError
+            Raised if the server returns a 4XX status because the request
+            is incorrect, not authenticated, or not authorized.
+        kafkit.registry.RegistryBrokenError
+            Raised if the server returns a 5XX status because something is
+            wrong with the server itself.
+        """
         data = await self._make_request("PATCH", url, url_vars, data)
 
     async def put(self, url, url_vars=dict(), data=b""):
+        """Send an HTTP PUT request.
+
+        Parameters
+        ----------
+        url : `str`
+            The endpoint path, usually relative to the ``host`` attribute
+            (an absolute URL is also okay). The url can be templated
+            (``/a{/b}/c``, where ``b`` is a variable).
+        url_vars : `dict`, optional
+            A dictionary of variable names and values to expand the templated
+            ``url`` parameter.
+        data : object, optional
+            The body of the request as a JSON-serializable object.
+
+        Returns
+        -------
+        data
+            The response body. If the response is JSON, the data is parsed
+            into a Python object.
+
+        Raises
+        ------
+        kafkit.registry.RegistryRedirectionError
+            Raised if the server returns a 3XX status.
+        kafkit.registry.RegistryRadRequestError
+            Raised if the server returns a 4XX status because the request
+            is incorrect, not authenticated, or not authorized.
+        kafkit.registry.RegistryBrokenError
+            Raised if the server returns a 5XX status because something is
+            wrong with the server itself.
+        """
         data = await self._make_request("PATCH", url, url_vars, data)
 
     async def delete(self, url, url_vars=dict(), *, data=b""):
+        """Send an HTTP DELETE request.
+
+        Parameters
+        ----------
+        url : `str`
+            The endpoint path, usually relative to the ``host`` attribute
+            (an absolute URL is also okay). The url can be templated
+            (``/a{/b}/c``, where ``b`` is a variable).
+        url_vars : `dict`, optional
+            A dictionary of variable names and values to expand the templated
+            ``url`` parameter.
+        data : object, optional
+            The body of the request as a JSON-serializable object.
+
+        Returns
+        -------
+        data
+            The response body. If the response is JSON, the data is parsed
+            into a Python object.
+
+        Raises
+        ------
+        kafkit.registry.RegistryRedirectionError
+            Raised if the server returns a 3XX status.
+        kafkit.registry.RegistryRadRequestError
+            Raised if the server returns a 4XX status because the request
+            is incorrect, not authenticated, or not authorized.
+        kafkit.registry.RegistryBrokenError
+            Raised if the server returns a 5XX status because something is
+            wrong with the server itself.
+        """
         data = await self._make_request("DELETE", url, url_vars, data)
