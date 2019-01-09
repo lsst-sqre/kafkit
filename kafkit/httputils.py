@@ -4,8 +4,9 @@ This code is based on on the sans-io code of Gidgethub
 (https://github.com/brettcannon/gidgethub) and generalized for Kafkit.
 """
 
-__all__ = ('format_url',)
+__all__ = ('format_url', 'parse_content_type')
 
+import cgi
 import urllib
 
 import uritemplate
@@ -34,3 +35,18 @@ def format_url(*, host, url, url_vars):
     """
     url = urllib.parse.urljoin(host, url)
     return uritemplate.expand(url, **url_vars)
+
+
+def parse_content_type(content_type):
+    """Tease out the content-type and character encoding.
+
+    A default character encoding of UTF-8 is used, so the content-type
+    must be used to determine if any decoding is necessary to begin
+    with.
+    """
+    if not content_type:
+        return None, "utf-8"
+    else:
+        type_, parameters = cgi.parse_header(content_type)
+        encoding = parameters.get("charset", "utf-8")
+        return type_, encoding

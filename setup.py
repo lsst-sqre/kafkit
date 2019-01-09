@@ -28,6 +28,7 @@ install_requires = [
 tests_require = [
     'pytest==4.0.2',
     'pytest-flake8==1.0.2',
+    'pytest-asyncio==0.10.0',
 ]
 tests_require += install_requires
 
