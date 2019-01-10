@@ -308,6 +308,70 @@ class RegistryApi(abc.ABC):
         """
         data = await self._make_request("DELETE", url, url_vars, data)
 
+    @staticmethod
+    def _prep_schema(schema):
+        """Prep a schema for submission through an API request by
+        removing any fastavro hints and dumping to a string.
+        """
+        schema = schema.copy()
+        try:
+            del schema['__fastavro_parsed']
+        except KeyError:
+            pass
+        # sort keys for repeatable tests
+        return json.dumps(schema, sort_keys='true')
+
+    async def register_schema(self, schema, subject=None):
+        """Register a schema or get the ID of an existing schema.
+
+        Wraps ``POST /subjects/(string: subject)/versions``.
+
+        Parameters
+        ----------
+        schema : `dict`
+            An `Avro schema <http://avro.apache.org/docs/current/spec.html>`__
+            as a Python dictionary.
+        subject : `str`, optional
+            The subject to register the schema under. If not provided, the
+            fully-qualified name of the schema is adopted as the subject name.
+
+        Returns
+        -------
+        schema_id : `int`
+            The ID of the schema in the registry.
+
+        Notes
+        -----
+        The schema and ID is cached locally so that repeated calls are fast.
+        """
+        # Parsing the schema also produces a fully-qualified name, which is
+        # useful for getting a subject name.
+        schema = fastavro.parse_schema(schema)
+
+        # look in cache first
+        try:
+            schema_id = self.schemas[schema]
+            return schema_id
+        except KeyError:
+            pass
+
+        if subject is None:
+            try:
+                subject = schema['name']
+            except (KeyError, TypeError):
+                raise RuntimeError('Cannot get a subject name from a \'name\' '
+                                   f'key in the schema: {schema!r}')
+
+        result = await self.post(
+            '/subjects{/subject}/versions',
+            url_vars={'subject': subject},
+            data={'schema': self._prep_schema(schema)})
+
+        # add to cache
+        self.schemas.insert(schema, result['id'])
+
+        return result['id']
+
 
 class SchemaCache:
     """A cache of schemas that maintains a mapping of schemas and their IDs

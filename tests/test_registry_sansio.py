@@ -137,6 +137,48 @@ async def test_registryapi_get_json():
     assert response == expected_data
 
 
+@pytest.mark.asyncio
+async def test_register_schema():
+    """Test the RegistryApi.register_schema() method.
+    """
+    input_schema = {
+        'type': 'record',
+        'name': 'schema1',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'int'}
+        ]
+    }
+
+    # Body that we expect the registry API to return given the request.
+    expected_body = json.dumps({'id': 1}).encode('utf-8')
+
+    client = MockRegistryApi(
+        host='http://registry:8081',
+        body=expected_body
+    )
+    schema_id = await client.register_schema(input_schema)
+    assert schema_id == 1
+
+    # Test details of the request itself
+    assert client.method == 'POST'
+    assert client.url == \
+        'http://registry:8081/subjects/test-schemas.schema1/versions'
+    sent_json = json.loads(client.body)
+    assert 'schema' in sent_json
+    sent_schema = json.loads(sent_json['schema'])
+    assert '__fastavro_parsed' not in sent_schema
+    assert sent_schema['name'] == 'test-schemas.schema1'
+
+    # Check that the schema is in the cache and is parsed
+    assert client.schemas[1]['name'] == 'test-schemas.schema1'
+    assert '__fastavro_parsed' in client.schemas[1]
+
+    # Make a second call to get the schema out
+    new_schema_id = await client.register_schema(input_schema)
+    assert new_schema_id == schema_id
+
+
 class MockRegistryApi(RegistryApi):
     """A mock implementation of the RegistryApi client that doens't do
     network operations and provides attributes for introspection.
