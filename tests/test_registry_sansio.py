@@ -6,7 +6,7 @@ import json
 import pytest
 
 from kafkit.registry.sansio import (make_headers, decipher_response,
-                                    RegistryApi, SchemaCache)
+                                    MockRegistryApi, SchemaCache)
 from kafkit.registry.errors import (
     RegistryRedirectionError, RegistryBadRequestError, RegistryBrokenError)
 
@@ -177,31 +177,6 @@ async def test_register_schema():
     # Make a second call to get the schema out
     new_schema_id = await client.register_schema(input_schema)
     assert new_schema_id == schema_id
-
-
-class MockRegistryApi(RegistryApi):
-    """A mock implementation of the RegistryApi client that doens't do
-    network operations and provides attributes for introspection.
-    """
-
-    DEFAULT_HEADERS = {
-        'content-type': "application/vnd.schemaregistry.v1+json"
-    }
-
-    def __init__(self, host='http://registry:8081',
-                 status_code=200, headers=None, body=b''):
-        super().__init__(host=host)
-        self.response_code = status_code
-        self.response_headers = headers if headers else self.DEFAULT_HEADERS
-        self.response_body = body
-
-    async def _request(self, method, url, headers, body):
-        self.method = method
-        self.url = url
-        self.headers = headers
-        self.body = body
-        response_headers = self.response_headers.copy()
-        return self.response_code, response_headers, self.response_body
 
 
 def test_schema_cache():
