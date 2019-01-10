@@ -20,7 +20,8 @@ readme = Path(__file__).parent / 'README.rst'
 
 # Core dependencies
 install_requires = [
-    'uritemplate'
+    'uritemplate',
+    'fastavro',
 ]
 
 # For aiohttp extra
