@@ -6,7 +6,7 @@ import json
 import pytest
 
 from kafkit.registry.sansio import (make_headers, decipher_response,
-                                    RegistryApi)
+                                    RegistryApi, SchemaCache)
 from kafkit.registry.errors import (
     RegistryRedirectionError, RegistryBadRequestError, RegistryBrokenError)
 
@@ -160,3 +160,46 @@ class MockRegistryApi(RegistryApi):
         self.body = body
         response_headers = self.response_headers.copy()
         return self.response_code, response_headers, self.response_body
+
+
+def test_schema_cache():
+    cache = SchemaCache()
+
+    schema1 = {
+        'type': 'record',
+        'name': 'schema1',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'int'}
+        ]
+    }
+
+    schema2 = {
+        'type': 'record',
+        'name': 'schema2',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'string'}
+        ]
+    }
+
+    cache.insert(schema1, 1)
+    cache.insert(schema2, 2)
+
+    # test not only that you get the schemas by ID, but that it was
+    # parsed by fastavro
+    assert cache[1]['name'] == 'test-schemas.schema1'
+    assert cache[2]['name'] == 'test-schemas.schema2'
+
+    # Get schemas by the schema itself
+    assert cache[schema1] == 1
+    assert cache[schema2] == 2
+
+    # Schemas don't exist
+    with pytest.raises(KeyError):
+        cache[0]
+    with pytest.raises(KeyError):
+        schemaX = {
+            "type": "unknown"
+        }
+        cache[schemaX]

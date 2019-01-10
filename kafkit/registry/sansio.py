@@ -6,11 +6,14 @@ https://github.com/brettcannon/gidgethub and https://sans-io.readthedocs.io.
 See licenses/gidgethub.txt for license info.
 """
 
-__all__ = ('make_headers', 'decipher_response', 'decode_body', 'RegistryApi')
+__all__ = ('make_headers', 'decipher_response', 'decode_body', 'RegistryApi',
+           'SchemaCache')
 
 import abc
 import json
 import logging
+
+import fastavro
 
 from kafkit.httputils import format_url, parse_content_type
 from kafkit.registry.errors import (
@@ -107,6 +110,7 @@ class RegistryApi(abc.ABC):
 
     def __init__(self, *, host):
         self.host = host
+        self.schemas = SchemaCache()
 
     @abc.abstractmethod
     async def _request(self, method, url, headers, body):
@@ -303,3 +307,57 @@ class RegistryApi(abc.ABC):
             wrong with the server itself.
         """
         data = await self._make_request("DELETE", url, url_vars, data)
+
+
+class SchemaCache:
+    """A cache of schemas that maintains a mapping of schemas and their IDs
+    in a Schema Registry.
+
+    Notes
+    -----
+    Use key access to obtain the schema either by ID, or by the value of the
+    schema itself.
+    """
+
+    def __init__(self):
+        self._id_to_schema = {}
+        self._schema_to_id = {}
+
+    def insert(self, schema, schema_id):
+        """Insert a schema into the cache.
+
+        Parameters
+        ----------
+        schema : `dict`
+            An Avro schema.
+        schema_id : `int`
+            ID of the schema in a Schema Registry.
+        """
+        # ensure the cached schemas are always parsed, and then serialize
+        # so it's hashable
+        serialized_schema = SchemaCache._serialize_schema(schema)
+
+        self._id_to_schema[schema_id] = serialized_schema
+        self._schema_to_id[serialized_schema] = schema_id
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return json.loads(self._id_to_schema[key])
+        else:
+            # Key must be a schema
+            # Always ensure the schema is parsed
+            schema = key.copy()
+            try:
+                serialized_schema = SchemaCache._serialize_schema(schema)
+            except Exception:
+                # If the schema couldn't be parsed, its not going to be a
+                # valid key anyhow.
+                raise KeyError
+            return self._schema_to_id[serialized_schema]
+
+    @staticmethod
+    def _serialize_schema(schema):
+        """Predictably serialize the schema so that it's hashable.
+        """
+        schema = fastavro.parse_schema(schema)
+        return json.dumps(schema, sort_keys=True)
