@@ -108,8 +108,8 @@ class RegistryApi(abc.ABC):
     """A baseclass for Confluent Schema Registry clients.
     """
 
-    def __init__(self, *, host):
-        self.host = host
+    def __init__(self, *, url):
+        self.url = url
         self.schemas = SchemaCache()
 
     @abc.abstractmethod
@@ -120,7 +120,7 @@ class RegistryApi(abc.ABC):
     async def _make_request(self, method, url, url_vars, data):
         """Construct and make an HTTP request.
         """
-        expanded_url = format_url(host=self.host, url=url, url_vars=url_vars)
+        expanded_url = format_url(host=self.url, url=url, url_vars=url_vars)
         request_headers = make_headers()
 
         if data == b"":
@@ -144,8 +144,8 @@ class RegistryApi(abc.ABC):
         Parameters
         ----------
         url : `str`
-            The endpoint path, usually relative to the ``host`` attribute
-            (an absolute URL is also okay). The url can be templated
+            The endpoint path, usually relative to the ``RegistryApi.url``
+            attribute (an absolute URL is also okay). The url can be templated
             (``/a{/b}/c``, where ``b`` is a variable).
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
@@ -177,8 +177,8 @@ class RegistryApi(abc.ABC):
         Parameters
         ----------
         url : `str`
-            The endpoint path, usually relative to the ``host`` attribute
-            (an absolute URL is also okay). The url can be templated
+            The endpoint path, usually relative to the ``RegistryApi.url``
+            attribute (an absolute URL is also okay). The url can be templated
             (``/a{/b}/c``, where ``b`` is a variable).
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
@@ -212,8 +212,8 @@ class RegistryApi(abc.ABC):
         Parameters
         ----------
         url : `str`
-            The endpoint path, usually relative to the ``host`` attribute
-            (an absolute URL is also okay). The url can be templated
+            The endpoint path, usually relative to the ``RegistryApi.url``
+            attribute (an absolute URL is also okay). The url can be templated
             (``/a{/b}/c``, where ``b`` is a variable).
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
@@ -246,8 +246,8 @@ class RegistryApi(abc.ABC):
         Parameters
         ----------
         url : `str`
-            The endpoint path, usually relative to the ``host`` attribute
-            (an absolute URL is also okay). The url can be templated
+            The endpoint path, usually relative to the ``RegistryApi.url``
+            attribute (an absolute URL is also okay). The url can be templated
             (``/a{/b}/c``, where ``b`` is a variable).
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
@@ -280,8 +280,8 @@ class RegistryApi(abc.ABC):
         Parameters
         ----------
         url : `str`
-            The endpoint path, usually relative to the ``host`` attribute
-            (an absolute URL is also okay). The url can be templated
+            The endpoint path, usually relative to the ``RegistryApi.url``
+            attribute (an absolute URL is also okay). The url can be templated
             (``/a{/b}/c``, where ``b`` is a variable).
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
@@ -423,9 +423,9 @@ class MockRegistryApi(RegistryApi):
         'content-type': "application/vnd.schemaregistry.v1+json"
     }
 
-    def __init__(self, host='http://registry:8081',
+    def __init__(self, url='http://registry:8081',
                  status_code=200, headers=None, body=b''):
-        super().__init__(host=host)
+        super().__init__(url=url)
         self.response_code = status_code
         self.response_headers = headers if headers else self.DEFAULT_HEADERS
         self.response_body = body

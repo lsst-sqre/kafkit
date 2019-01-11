@@ -16,13 +16,13 @@ class RegistryApi(sansio.RegistryApi):
     ---------
     session : `aiohittp.ClientSession`
         An aiohttp client session.
-    host : `str`
-        The Confluent Schema Registry host name (e.g. http://registry:8081).
+    url : `str`
+        The Confluent Schema Registry URL (e.g. http://registry:8081).
     """
 
-    def __init__(self, *, session, host):
+    def __init__(self, *, session, url):
         self._session = session
-        super().__init__(host=host)
+        super().__init__(url=url)
 
     async def _request(self, method, url, headers, body):
         async with self._session.request(

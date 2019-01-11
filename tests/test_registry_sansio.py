@@ -111,7 +111,7 @@ def test_decipher_response_301_with_message():
 async def test_registryapi_get_empty():
     """Test client with a regular GET call with empty response.
     """
-    client = MockRegistryApi(host='http://registry:8081')
+    client = MockRegistryApi(url='http://registry:8081')
     response = await client.get('/subjects{/subject}/versions',
                                 url_vars={'subject': 'helloworld'})
 
@@ -129,7 +129,7 @@ async def test_registryapi_get_json():
     """
     expected_data = {'hello': 'world'}
     client = MockRegistryApi(
-        host='http://registry:8081',
+        url='http://registry:8081',
         body=json.dumps(expected_data).encode('utf-8'))
     response = await client.get('/subjects{/subject}/versions',
                                 url_vars={'subject': 'helloworld'})
@@ -154,7 +154,7 @@ async def test_register_schema():
     expected_body = json.dumps({'id': 1}).encode('utf-8')
 
     client = MockRegistryApi(
-        host='http://registry:8081',
+        url='http://registry:8081',
         body=expected_body
     )
     schema_id = await client.register_schema(input_schema)
