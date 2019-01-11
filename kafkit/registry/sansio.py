@@ -342,7 +342,9 @@ class RegistryApi(abc.ABC):
 
         Notes
         -----
-        The schema and ID is cached locally so that repeated calls are fast.
+        The schema and ID are cached locally so that repeated calls are fast.
+        This cache is shared by other high-level methods, like
+        `get_schema_by_id`.
         """
         # Parsing the schema also produces a fully-qualified name, which is
         # useful for getting a subject name.
@@ -371,6 +373,45 @@ class RegistryApi(abc.ABC):
         self.schemas.insert(schema, result['id'])
 
         return result['id']
+
+    async def get_schema_by_id(self, schema_id):
+        """Get a schema from the registry given its ID.
+
+        Wraps ``GET /schemas/ids/{int: id}``.
+
+        Parameters
+        ----------
+        schema_id : `int`
+            The ID of the schema in the registry.
+
+        Returns
+        -------
+        schema : `dict`
+            The Avro schema. The schema is pre-parsed by
+            `fastavro.parse_schema`.
+
+        Notes
+        -----
+        The schema and ID are cached locally so that repeated calls are fast.
+        This cache is shared by other high-level methods, like
+        `register_schema`.
+        """
+        # Look in the cache first
+        try:
+            schema = self.schemas[schema_id]
+            return schema
+        except KeyError:
+            pass
+
+        result = await self.get(
+            '/schemas/ids{/schema_id}',
+            url_vars={'schema_id': str(schema_id)})
+        schema = fastavro.parse_schema(result['schema'])
+
+        # Add schema to cache
+        self.schemas.insert(schema, schema_id)
+
+        return schema
 
 
 class MockRegistryApi(RegistryApi):

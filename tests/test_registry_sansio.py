@@ -179,6 +179,39 @@ async def test_register_schema():
     assert new_schema_id == schema_id
 
 
+@pytest.mark.asyncio
+async def test_get_schema_by_id():
+    """Test the RegistryApi.get_schema_by_id method.
+    """
+    # Body that we expect the registry API to return given the request.
+    input_schema = {
+        'type': 'record',
+        'name': 'schema1',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'int'}
+        ]
+    }
+    expected_body = json.dumps({'schema': input_schema}).encode('utf-8')
+
+    client = MockRegistryApi(
+        body=expected_body
+    )
+
+    schema = await client.get_schema_by_id(1)
+
+    # Check that the schema was parsed
+    assert schema['name'] == 'test-schemas.schema1'
+    assert '__fastavro_parsed' in client.schemas[1]
+
+    # Check that the schem was cached
+    assert client.schemas[1]['name'] == 'test-schemas.schema1'
+
+    # Check the request
+    assert client.url == 'http://registry:8081/schemas/ids/1'
+    assert client.method == 'GET'
+
+
 def test_schema_cache():
     cache = SchemaCache()
 
