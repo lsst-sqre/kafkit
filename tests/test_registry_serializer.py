@@ -8,7 +8,8 @@ import fastavro
 import pytest
 
 from kafkit.registry.serializer import (
-    pack_wire_format_prefix, unpack_wire_format_data, Serializer, Deserializer)
+    pack_wire_format_prefix, unpack_wire_format_data, Serializer, Deserializer,
+    PolySerializer)
 from kafkit.registry.sansio import MockRegistryApi
 
 
@@ -122,3 +123,81 @@ async def test_deserializer():
     assert response_2['message'] == message_2
     assert 'schema' in response_2
     assert response_2['schema']['name'] == 'test-schemas.schema2'
+
+
+@pytest.mark.asyncio
+async def test_polyserializer_given_id():
+    """Test the PolySerializer class, given schema IDs.
+    """
+    # First schema
+    schema1 = {
+        'type': 'record',
+        'name': 'schema1',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'int'},
+            {'name': 'b', 'type': 'string'}
+        ]
+    }
+    schema1_id = 1
+    # Second schema
+    schema2 = {
+        'type': 'record',
+        'name': 'schema2',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'c', 'type': 'int'},
+            {'name': 'd', 'type': 'string'}
+        ]
+    }
+    schema2_id = 2
+    # insert the schemas directly into the cache
+    client = MockRegistryApi()
+    client.schemas.insert(schema1, schema1_id)
+    client.schemas.insert(schema2, schema2_id)
+
+    serializer = PolySerializer(registry=client)
+
+    message_1 = {'a': 42, 'b': 'hello'}
+    data_1 = await serializer.serialize(message_1, schema_id=schema1_id)
+
+    message_2 = {'c': 13, 'd': 'bonjour'}
+    data_2 = await serializer.serialize(message_2, schema_id=schema2_id)
+
+    # Deserialization
+    deserializer = Deserializer(registry=client)
+
+    response_1 = await deserializer.deserialize(data_1)
+    assert response_1['id'] == schema1_id
+    assert response_1['message'] == message_1
+
+    response_2 = await deserializer.deserialize(data_2)
+    assert response_2['id'] == schema2_id
+    assert response_2['message'] == message_2
+
+
+@pytest.mark.asyncio
+async def test_polyserializer_given_schema():
+    """Test the PolyySerializer class, given a schema itself.
+    """
+    schema = {
+        'type': 'record',
+        'name': 'schema1',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'int'},
+            {'name': 'b', 'type': 'string'}
+        ]
+    }
+
+    body = json.dumps({"id": 1}).encode('utf-8')
+    client = MockRegistryApi(body=body)
+
+    serializer = PolySerializer(registry=client)
+    deserializer = Deserializer(registry=client)
+
+    message = {'a': 42, 'b': 'hello'}
+    data = await serializer.serialize(message, schema=schema)
+    response = await deserializer.deserialize(data)
+    assert response['id'] == 1
+    assert response['message'] == message

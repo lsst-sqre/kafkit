@@ -2,8 +2,8 @@
 Confluent Schema Registry.
 """
 
-__all__ = ('Serializer', 'Deserializer', 'pack_wire_format_prefix',
-           'unpack_wire_format_data')
+__all__ = ('Serializer', 'PolySerializer', 'Deserializer',
+           'pack_wire_format_prefix', 'unpack_wire_format_data')
 
 from io import BytesIO
 import struct
@@ -111,13 +111,76 @@ class Serializer:
         message : `bytes`
             Message in the Confluent Schema Registry wire format.
         """
-        message_fh = BytesIO()
-        # Write the Confluent Wire Format prefix.
-        message_fh.write(pack_wire_format_prefix(self.id))
-        # Write the Avro-encoded message
-        fastavro.schemaless_writer(message_fh, self.schema, data)
-        message_fh.seek(0)
-        return message_fh.read()
+        return _make_message(data=data, schema_id=self.id, schema=self.schema)
+
+
+class PolySerializer:
+    """An Avro message serializer that can write messages for multiple schemas
+    in the Confluent Wire Format.
+
+    Parameters
+    ----------
+    registry : `kafkit.registry.sansio.RegistryApi`
+        A registry client.
+    """
+
+    def __init__(self, *, registry):
+        self._registry = registry
+
+    async def serialize(self, data, schema=None, schema_id=None, subject=None):
+        """Serialize data given a schema.
+
+        Parameters
+        ----------
+        data
+            An Avro-serializable object. The object must conform to the schema.
+        schema_id : `int`, optional
+            The ID of the schema in the Schema Registry. Even if a ``schema``
+            is also provided, this method will always obtain the schema through
+            the registry client. If this parameter isn't set then the
+            ``schema`` parmeter is used.
+        schema : `dict`, optional
+            An Avro schema. This parameter is ignored if the ``schema_id``
+            parameter is set. If necessary (because the schema isn't found in
+            the registry) this schema is registered with
+            the schema registry. By default, the schema is registered under a
+            subject named after the fully-qualified name of the schema. This
+            default can be overriden by setting the ``subject`` parameter.
+        subject : `str`, optional
+            If the ``schema`` parameter is set **and** that schema needs to
+            be newly registered with the schema registry, the schema is
+            registered under this subject name. This is optional; by default
+            the schema is registered under a subject named after the fully
+            qualified name of the schema.
+
+        Returns
+        -------
+        message : `bytes`
+            Message in the Confluent Schema Registry `wire format`_.
+
+        .. _wire format:
+           https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format
+        """
+        if schema_id is not None:
+            schema = await self._registry.get_schema_by_id(schema_id)
+        elif schema is not None:
+            schema_id = await self._registry.register_schema(
+                schema=schema, subject=subject)
+        else:
+            raise RuntimeError('Pass either a schema or schema_id parameter.')
+        return _make_message(data=data, schema_id=schema_id, schema=schema)
+
+
+def _make_message(*, schema_id, schema, data):
+    """Make a message in the Confluent Wire Format.
+    """
+    message_fh = BytesIO()
+    # Write the Confluent Wire Format prefix.
+    message_fh.write(pack_wire_format_prefix(schema_id))
+    # Write the Avro-encoded message
+    fastavro.schemaless_writer(message_fh, schema, data)
+    message_fh.seek(0)
+    return message_fh.read()
 
 
 class Deserializer:
