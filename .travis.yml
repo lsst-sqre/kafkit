@@ -30,5 +30,5 @@ deploy:
     secure: "TMM/pLdmvPX2hDzm2q62sYWDLvKTgK6UBqXcdoGAt40+RmGlD2Pfi6cizfLVYdXls8NXB3YDLU0y/TqVYExZO7pdU2lsM3Qcq5+HoHG03tzVG3F7+wClhpK9Qm+b+z4bywqUVoZI0HFYX5A1Joi6r2jJuX7GXyw+I3ouhUKhkgkdday+u9tUDaYo5wF3MsiW8TBOeUsjJOc/Kdnsvp/ecqU6DQOcL0XPzYRfzyOnneKMPR4Vz8nC6Bs22LC7JUA6ELEzs3LpDGABgUzLB2MmdTtIGg4nK03t3AAw98bZwk/PDBXXqd0ylFCiMHLiS4V/3dqgm2e7w7eyVH+FfFE3mIBGakoX1KnCuKMpVImQV1/ezwG+xa1wc1NNHOTiqfmvosJeFcSn9RoeB/k1bSmhJcy7am7ttOLBj96eWOuaFJWhLWoMRfkC8am2xlaMhzIsfk6oop0XiOqX8RvLNDjn38aQQ3qwN031xy42vRmtr3c6r/fsu8+t8AhIWQaVctf2cMCfS1ZxUn1IenLnbzCbRmi/TpxEx4Ae8w3O7IlUry7hTVpbDlu6+dfuqiQ1MNi9CsMH4Ss54KrxwbRpIAonGUfpwZshEyhpEPTRrfu+CHyZSBi8i0JWkYvsCJMBuSA5REEw8uMSM72vy0ot8PvVFG+e5sbP7Kd1nIZc2es8WoA="
   on:
     tags: true
-    repo: lsst-sqre/templatekit
+    repo: lsst-sqre/kafkit
     condition: "$PYPI_DEPLOY = true"
