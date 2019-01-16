@@ -534,9 +534,163 @@ class SchemaCache:
                 raise KeyError
             return self._schema_to_id[serialized_schema]
 
+    def __contains__(self, key):
+        try:
+            self[key]
+        except KeyError:
+            return False
+        return True
+
     @staticmethod
     def _serialize_schema(schema):
         """Predictably serialize the schema so that it's hashable.
         """
         schema = fastavro.parse_schema(schema)
         return json.dumps(schema, sort_keys=True)
+
+
+class SubjectCache:
+    """A cache of subjects in a schema registry that maps subject and version
+    tuples to an actual schema.
+
+    Parameters
+    ----------
+    schema_cache : `SchemaCache`
+        A schema cache instance.
+
+    Notes
+    -----
+    The SubjectCache provides a subject-aware layer over the `SchemaCache`.
+    While schemas and their IDs are unique in a schema registry, multiple
+    subject-version combinations can point to the same schema-ID combination.
+
+    When you insert a schema into the SubjectCache, you are also inserting
+    the schema and schema ID into the member `SchemaCache`.
+    """
+
+    def __init__(self, schema_cache):
+        self.schema_cache = schema_cache
+
+        self._subject_to_id = {}
+
+    def get_id(self, subject, version):
+        """Get the schema ID of a subject version.
+
+        Parameters
+        ----------
+        subject : `str`
+            The name of the subject.
+        version : `int`
+            The version number of the schema in the subject.
+
+        Returns
+        -------
+        schema_id : `int`
+            ID of the schema in a Schema Registry.
+
+        Raises
+        ------
+        ValueError
+            Raised if the schema does not exist in the cache.
+        """
+        try:
+            return self._subject_to_id[(subject, version)]
+        except KeyError as e:
+            raise ValueError from e
+
+    def get_schema(self, subject, version):
+        """Get the schema of a subject version.
+
+        Parameters
+        ----------
+        subject : `str`
+            The name of the subject.
+        version : `int`
+            The version number of the schema in the subject.
+
+        Returns
+        -------
+        schema : `dict`
+            An Avro schema.
+
+        Raises
+        ------
+        ValueError
+            Raised if the schema does not exist in the cache.
+        """
+        try:
+            return self.schema_cache[self.get_id(subject, version)]
+        except KeyError as e:
+            raise ValueError from e
+
+    def insert(self, subject, version, schema_id=None, schema=None):
+        """Insert a subject version into the cache.
+
+        Parameters
+        ----------
+        subject : `str`
+            The name of the subject.
+        version : `int`
+            The version number of the schema in the subject.
+        schema_id : `int`, optional
+            ID of the schema in a Schema Registry. See Notes.
+        schema : `dict`, optional
+            The Avro schema itself. See Notes.
+
+        Raises
+        ------
+        TypeError
+            Raised if the ``version`` parameter is a string. String-based
+            versions, like "latest," cannot be cached.
+        ValueError
+            Raised if the ``schema_id`` or ``schema`` parameters are needed
+            but aren't set. See Notes.
+
+        Notes
+        -----
+        If the subject version being cached is already in the schema cache,
+        then only one of ``schema_id`` or ``schema`` need to be passed to this
+        method. However, if the schema isn't cached, then both ``schema_id``
+        and ``schema`` need to be set. The ``schema_id`` and ``schema`` are
+        added to the underlying schema cache.
+        """
+        if not isinstance(version, int):
+            raise TypeError(
+                'Cannot cache a non-integer version of a subject '
+                '(such as "latest").'
+            )
+
+        if schema_id is not None:
+            if schema_id not in self.schema_cache:
+                # Need to add this schema to the schema_cache first
+                if schema is None:
+                    raise ValueError(
+                        'Trying to cache the schema ID for subject '
+                        f'{subject!r}, version {version}, but it\'s schema ID '
+                        f'({schema_id}) and schema are not in the schema '
+                        'cache. Provide the schema as well as the schema_id.'
+                    )
+                self.schema_cache.insert(schema, schema_id)
+            self._subject_to_id[(subject, version)] = schema_id
+
+        elif schema is not None:
+            if schema not in self.schema_cache:
+                # Need to add this schema to the schema_cache first
+                if schema_id is None:
+                    raise ValueError(
+                        'Trying to cache the schema ID for subject '
+                        f'{subject!r}, version {version}, but it\'s schema ID '
+                        'and schema are not in the schema cache. Provide the '
+                        'schema argument as well as schema_id.'
+                    )
+                self.schema_cache.insert(schema, schema_id)
+            schema_id = self.schema_cache[schema]
+            self._subject_to_id[(subject, version)] = schema_id
+
+        else:
+            raise ValueError(
+                'Provide either a schema_id or schema argument (or both).'
+            )
+
+    def __contains__(self, key):
+        return key in self._subject_to_id

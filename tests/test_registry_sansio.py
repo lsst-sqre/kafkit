@@ -6,7 +6,7 @@ import json
 import pytest
 
 from kafkit.registry.sansio import (make_headers, decipher_response,
-                                    MockRegistryApi, SchemaCache)
+                                    MockRegistryApi, SchemaCache, SubjectCache)
 from kafkit.registry.errors import (
     RegistryRedirectionError, RegistryBadRequestError, RegistryBrokenError)
 
@@ -292,3 +292,71 @@ def test_schema_cache():
             "type": "unknown"
         }
         cache[schemaX]
+
+
+def test_subject_cache():
+    cache = SubjectCache(SchemaCache())
+
+    schema1 = {
+        'type': 'record',
+        'name': 'schema1',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'int'}
+        ]
+    }
+
+    schema2 = {
+        'type': 'record',
+        'name': 'schema2',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'string'}
+        ]
+    }
+
+    schema3 = {
+        'type': 'record',
+        'name': 'schema3',
+        'namespace': 'test-schemas',
+        'fields': [
+            {'name': 'a', 'type': 'boolean'}
+        ]
+    }
+
+    # pre-cache schema1 and schema2
+    cache.schema_cache.insert(schema1, 1)
+    cache.schema_cache.insert(schema2, 2)
+
+    # Test inserting subject info for a pre-cached schema
+    cache.insert('schema1', 25, schema_id=1)
+    assert ('schema1', 25) in cache
+    assert cache.get_id('schema1', 25) == 1
+    assert cache.get_schema('schema1', 25)['name'] == 'test-schemas.schema1'
+
+    cache.insert('schema2', 32, schema=schema2)
+    assert ('schema2', 32) in cache
+    assert cache.get_id('schema2', 32) == 2
+    assert cache.get_schema('schema2', 32)['name'] == 'test-schemas.schema2'
+
+    # Test inserting a subject that does not have a pre-cached schema
+    with pytest.raises(ValueError):
+        cache.insert('schema3', 13)
+    with pytest.raises(ValueError):
+        cache.insert('schema3', 13, schema_id=3)
+    with pytest.raises(ValueError):
+        cache.insert('schema3', 13, schema=schema3)
+    cache.insert('schema3', 13, schema=schema3, schema_id=3)
+    assert ('schema3', 13) in cache
+    assert cache.get_id('schema3', 13) == 3
+    assert cache.get_schema('schema3', 13)['name'] == 'test-schemas.schema3'
+
+    # Test getting a non-existent subject or version
+    with pytest.raises(ValueError):
+        cache.get_id('schema3', 25)
+    with pytest.raises(ValueError):
+        cache.get_schema('schema18', 25)
+
+    # Test caching 'latest'
+    with pytest.raises(TypeError):
+        cache.insert('mysubject', 'latest', schema_id=42)
