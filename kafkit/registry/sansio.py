@@ -390,6 +390,10 @@ class RegistryApi(abc.ABC):
             The Avro schema. The schema is pre-parsed by
             `fastavro.parse_schema`.
 
+        See also
+        --------
+        get_schema_by_subject
+
         Notes
         -----
         The schema and ID are cached locally so that repeated calls are fast.
@@ -412,6 +416,51 @@ class RegistryApi(abc.ABC):
         self.schemas.insert(schema, schema_id)
 
         return schema
+
+    async def get_schema_by_subject(self, subject, version='latest'):
+        """Get a schema for a subject in the registry.
+
+        Wraps ``GET /subjects/(string: subject)/versions/(versionId: version)``
+
+        Parameters
+        ----------
+        subject : `str`
+            Name of the subject in the Schema Registry.
+        version : `int` or `str`, optional
+            The version of the schema with respect to the ``subject``. To
+            get the latest schema, supply ``"latest"`` (default).
+
+        Returns
+        -------
+        schema_info : `dict`
+            A dictionary with the schema and metadata about the schema. The
+            keys are:
+
+            ``"schema"``
+                The schema itself, preparsed by `fastavro.parse_schema`.
+            ``"subject"``
+                The subject this schema is registered under in the registry.
+            ``"version"``
+                The version of this schema with respect to the ``subject``.
+            ``"id"``
+                The ID of this schema (compatible with `get_schema_by_id`).
+
+        See also
+        --------
+        get_schema_by_id
+        """
+        result = await self.get(
+            '/subjects{/subject}/versions{/version}',
+            url_vars={'subject': subject, 'version': str(version)})
+
+        schema = fastavro.parse_schema(result['schema'])
+
+        return {
+            'id': result['id'],
+            'version': result['version'],
+            'subject': result['subject'],
+            'schema': schema
+        }
 
 
 class MockRegistryApi(RegistryApi):
