@@ -61,7 +61,7 @@ async def test_serializer():
     unpacked_id, unpacked_body = unpack_wire_format_data(data)
     assert unpacked_id == serializer.id
     # Second, the message
-    unpacked_schema = client.schemas[unpacked_id]
+    unpacked_schema = client.schema_cache[unpacked_id]
     message_fh = BytesIO(unpacked_body)
     message_fh.seek(0)
     unpacked_message = fastavro.schemaless_reader(message_fh, unpacked_schema)
@@ -96,8 +96,8 @@ async def test_deserializer():
     schema2_id = 2
     # insert the schemas directly into the cache
     client = MockRegistryApi()
-    client.schemas.insert(schema1, schema1_id)
-    client.schemas.insert(schema2, schema2_id)
+    client.schema_cache.insert(schema1, schema1_id)
+    client.schema_cache.insert(schema2, schema2_id)
 
     # Serialize a couple messages, using the serializer. Since the schema
     # is cached it won't need a mocked response body.
@@ -153,8 +153,8 @@ async def test_polyserializer_given_id():
     schema2_id = 2
     # insert the schemas directly into the cache
     client = MockRegistryApi()
-    client.schemas.insert(schema1, schema1_id)
-    client.schemas.insert(schema2, schema2_id)
+    client.schema_cache.insert(schema1, schema1_id)
+    client.schema_cache.insert(schema2, schema2_id)
 
     serializer = PolySerializer(registry=client)
 

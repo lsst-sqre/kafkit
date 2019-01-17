@@ -110,8 +110,20 @@ class RegistryApi(abc.ABC):
 
     def __init__(self, *, url):
         self.url = url
-        self.schemas = SchemaCache()
-        self.subject_cache = SubjectCache(self.schemas)
+        self._schema_cache = SchemaCache()
+        self._subject_cache = SubjectCache(self._schema_cache)
+
+    @property
+    def schema_cache(self):
+        """The schema cache (`SchemaCache`).
+        """
+        return self._schema_cache
+
+    @property
+    def subject_cache(self):
+        """The subject cache (`SubjectCache`).
+        """
+        return self._subject_cache
 
     @abc.abstractmethod
     async def _request(self, method, url, headers, body):
@@ -353,7 +365,7 @@ class RegistryApi(abc.ABC):
 
         # look in cache first
         try:
-            schema_id = self.schemas[schema]
+            schema_id = self.schema_cache[schema]
             return schema_id
         except KeyError:
             pass
@@ -371,7 +383,7 @@ class RegistryApi(abc.ABC):
             data={'schema': self._prep_schema(schema)})
 
         # add to cache
-        self.schemas.insert(schema, result['id'])
+        self.schema_cache.insert(schema, result['id'])
 
         return result['id']
 
@@ -403,7 +415,7 @@ class RegistryApi(abc.ABC):
         """
         # Look in the cache first
         try:
-            schema = self.schemas[schema_id]
+            schema = self.schema_cache[schema_id]
             return schema
         except KeyError:
             pass
@@ -414,7 +426,7 @@ class RegistryApi(abc.ABC):
         schema = fastavro.parse_schema(result['schema'])
 
         # Add schema to cache
-        self.schemas.insert(schema, schema_id)
+        self.schema_cache.insert(schema, schema_id)
 
         return schema
 
