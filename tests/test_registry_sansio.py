@@ -237,6 +237,11 @@ async def test_get_schema_by_subject():
 
     result = await client.get_schema_by_subject('schema1')
 
+    # Check the request
+    assert client.url \
+        == 'http://registry:8081/subjects/schema1/versions/latest'
+    assert client.method == 'GET'
+
     # Check that the schema was parsed
     assert result['schema']['name'] == 'test-schemas.schema1'
     assert '__fastavro_parsed' in result['schema']
@@ -245,10 +250,12 @@ async def test_get_schema_by_subject():
     assert result['id'] == 2
     assert result['subject'] == 'schema1'
 
-    # Check the request
-    assert client.url \
-        == 'http://registry:8081/subjects/schema1/versions/latest'
-    assert client.method == 'GET'
+    # Check that the schema got cached
+    assert ('schema1', 1) in client.subject_cache
+
+    # Get that schema, purely using the cache
+    result2 = await client.get_schema_by_subject('schema1', version=1)
+    assert result == result2
 
 
 def test_schema_cache():
@@ -333,6 +340,11 @@ def test_subject_cache():
     assert ('schema1', 25) in cache
     assert cache.get_id('schema1', 25) == 1
     assert cache.get_schema('schema1', 25)['name'] == 'test-schemas.schema1'
+    schema1_info = cache.get('schema1', 25)
+    assert schema1_info['subject'] == 'schema1'
+    assert schema1_info['version'] == 25
+    assert schema1_info['id'] == 1
+    assert schema1_info['schema']['name'] == 'test-schemas.schema1'
 
     cache.insert('schema2', 32, schema=schema2)
     assert ('schema2', 32) in cache
@@ -356,6 +368,8 @@ def test_subject_cache():
         cache.get_id('schema3', 25)
     with pytest.raises(ValueError):
         cache.get_schema('schema18', 25)
+    with pytest.raises(ValueError):
+        cache.get('schema18', 15)
 
     # Test caching 'latest'
     with pytest.raises(TypeError):
