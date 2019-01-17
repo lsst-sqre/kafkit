@@ -592,6 +592,11 @@ class SubjectCache:
         ------
         ValueError
             Raised if the schema does not exist in the cache.
+
+        See also
+        --------
+        get_schema
+        get
         """
         try:
             return self._subject_to_id[(subject, version)]
@@ -611,17 +616,72 @@ class SubjectCache:
         Returns
         -------
         schema : `dict`
-            An Avro schema.
+            An Avro schema, preparsed by `fastavro.parse_schema`.
 
         Raises
         ------
         ValueError
             Raised if the schema does not exist in the cache.
+
+        See also
+        --------
+        get_id
+        get
         """
         try:
             return self.schema_cache[self.get_id(subject, version)]
         except KeyError as e:
             raise ValueError from e
+
+    def get(self, subject, version):
+        """Get the full set of schema and ID information for a subject version.
+
+        Parameters
+        ----------
+        subject : `str`
+            The name of the subject.
+        version : `int`
+            The version number of the schema in the subject.
+
+        Returns
+        -------
+        schema_info : `dict`
+            A dictionary with the full set of information about the cached
+            schema. The keys are:
+
+            ``"subject"``
+                The name of the subject.
+            ``"version"``
+                The version number of the schema in the subject.
+            ``"id"``
+                ID of the schema in a Schema Registry.
+            ``"schema"``
+                The Avro schema, preparsed by `fastavro.parse_schema`.
+
+        Raises
+        ------
+        ValueError
+            Raised if the schema does not exist in the cache.
+
+        See also
+        --------
+        get_id
+        get_schema
+        """
+        try:
+            schema_id = self.get_id(subject, version)
+            schema = self.schema_cache[schema_id]
+        except KeyError as e:
+            raise ValueError from e
+
+        # Important: this return type maches RegistryApi.get_schema_by_subject
+        # If this is changed, make sure get_schema_by_subject is also changed.
+        return {
+            'subject': subject,
+            'version': version,
+            'id': schema_id,
+            'schema': schema
+        }
 
     def insert(self, subject, version, schema_id=None, schema=None):
         """Insert a subject version into the cache.
