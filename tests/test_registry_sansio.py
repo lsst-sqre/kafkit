@@ -171,8 +171,8 @@ async def test_register_schema():
     assert sent_schema['name'] == 'test-schemas.schema1'
 
     # Check that the schema is in the cache and is parsed
-    assert client.schemas[1]['name'] == 'test-schemas.schema1'
-    assert '__fastavro_parsed' in client.schemas[1]
+    assert client.schema_cache[1]['name'] == 'test-schemas.schema1'
+    assert '__fastavro_parsed' in client.schema_cache[1]
 
     # Make a second call to get the schema out
     new_schema_id = await client.register_schema(input_schema)
@@ -202,10 +202,10 @@ async def test_get_schema_by_id():
 
     # Check that the schema was parsed
     assert schema['name'] == 'test-schemas.schema1'
-    assert '__fastavro_parsed' in client.schemas[1]
+    assert '__fastavro_parsed' in client.schema_cache[1]
 
     # Check that the schem was cached
-    assert client.schemas[1]['name'] == 'test-schemas.schema1'
+    assert client.schema_cache[1]['name'] == 'test-schemas.schema1'
 
     # Check the request
     assert client.url == 'http://registry:8081/schemas/ids/1'
