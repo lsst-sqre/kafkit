@@ -591,7 +591,7 @@ class SubjectCache:
         Raises
         ------
         ValueError
-            Raised if the schema does not exist.
+            Raised if the schema does not exist in the cache.
         """
         try:
             return self._subject_to_id[(subject, version)]
@@ -616,7 +616,7 @@ class SubjectCache:
         Raises
         ------
         ValueError
-            Raised if the schema does not exist.
+            Raised if the schema does not exist in the cache.
         """
         try:
             return self.schema_cache[self.get_id(subject, version)]
