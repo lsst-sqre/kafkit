@@ -111,6 +111,7 @@ class RegistryApi(abc.ABC):
     def __init__(self, *, url):
         self.url = url
         self.schemas = SchemaCache()
+        self.subject_cache = SubjectCache(self.schemas)
 
     @abc.abstractmethod
     async def _request(self, method, url, headers, body):
@@ -448,12 +449,38 @@ class RegistryApi(abc.ABC):
         See also
         --------
         get_schema_by_id
+
+        Notes
+        -----
+        Results from this method are cached locally, so repeated calls are
+        fast. Keep in mind that any call with the ``version`` parameter set
+        to ``"latest"`` will always miss the cache. The schema is still
+        cached, though, under it's true subject version. If you app repeatedly
+        calls this method, and you want to make use of caching, replace
+        ``"latest"`` versions with integer versions once they're known.
         """
+        try:
+            # The SubjectCache.get method is designed to have the same return
+            # type as this method.
+            return self.subject_cache.get(subject, version)
+        except ValueError:
+            pass
+
         result = await self.get(
             '/subjects{/subject}/versions{/version}',
             url_vars={'subject': subject, 'version': str(version)})
 
         schema = fastavro.parse_schema(result['schema'])
+
+        try:
+            self.subject_cache.insert(
+                result['subject'],
+                result['version'],
+                schema_id=result['id'],
+                schema=schema)
+        except TypeError:
+            # Can't cache versions like "latest"
+            pass
 
         return {
             'id': result['id'],
