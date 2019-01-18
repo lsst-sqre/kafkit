@@ -184,14 +184,14 @@ async def test_get_schema_by_id():
     """Test the RegistryApi.get_schema_by_id method.
     """
     # Body that we expect the registry API to return given the request.
-    input_schema = {
+    input_schema = json.dumps({
         'type': 'record',
         'name': 'schema1',
         'namespace': 'test-schemas',
         'fields': [
             {'name': 'a', 'type': 'int'}
         ]
-    }
+    })
     expected_body = json.dumps({'schema': input_schema}).encode('utf-8')
 
     client = MockRegistryApi(
@@ -218,14 +218,14 @@ async def test_get_schema_by_subject():
     """
     # Body that we expect the registry API to return given the request.
     expected_body = {
-        'schema': {
+        'schema': json.dumps({
             'type': 'record',
             'name': 'schema1',
             'namespace': 'test-schemas',
             'fields': [
                 {'name': 'a', 'type': 'int'}
             ]
-        },
+        }),
         "subject": "schema1",
         "version": 1,
         "id": 2
