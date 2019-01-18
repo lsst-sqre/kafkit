@@ -423,7 +423,7 @@ class RegistryApi(abc.ABC):
         result = await self.get(
             '/schemas/ids{/schema_id}',
             url_vars={'schema_id': str(schema_id)})
-        schema = fastavro.parse_schema(result['schema'])
+        schema = fastavro.parse_schema(json.loads(result['schema']))
 
         # Add schema to cache
         self.schema_cache.insert(schema, schema_id)
@@ -482,7 +482,7 @@ class RegistryApi(abc.ABC):
             '/subjects{/subject}/versions{/version}',
             url_vars={'subject': subject, 'version': str(version)})
 
-        schema = fastavro.parse_schema(result['schema'])
+        schema = fastavro.parse_schema(json.loads(result['schema']))
 
         try:
             self.subject_cache.insert(
