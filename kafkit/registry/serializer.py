@@ -2,8 +2,7 @@
 Confluent Schema Registry.
 """
 
-__all__ = ('Serializer', 'PolySerializer', 'Deserializer',
-           'pack_wire_format_prefix', 'unpack_wire_format_data')
+__all__ = ('Serializer', 'PolySerializer', 'Deserializer',)
 
 from io import BytesIO
 import struct
@@ -156,10 +155,8 @@ class PolySerializer:
         Returns
         -------
         message : `bytes`
-            Message in the Confluent Schema Registry `wire format`_.
-
-        .. _wire format:
-           https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format
+            Message in the Confluent Schema Registry `wire format
+            <https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format>`_.
         """
         if schema_id is not None:
             schema = await self._registry.get_schema_by_id(schema_id)
@@ -195,8 +192,11 @@ class Deserializer:
     Notes
     -----
     The Deserializer works exclusively with Avro-encoded messages in the
-    `Confluent Wire Format`_. This means that schemas for messages must be
-    available from a `Confluent Schema Registry`_.
+    `Confluent Wire Format
+    <https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format>`_.
+    This means that schemas for messages must be
+    available from a `Confluent Schema Registry
+    <https://docs.confluent.io/current/schema-registry/docs/index.html>`_.
 
     When an encoded message is deserialized in the `~Deserializer.deserialize`
     method, it does the following steps:
@@ -216,11 +216,6 @@ class Deserializer:
     `~kafkit.registry.sansio.RegistryApi`) and magic methods can't be
     coroutines. It's not the end of the world, though, just call
     `~Deserializer.deserialize` manually on by bytes obtained by the consumer.
-
-    .. _`Confluent Wire Format`:
-       https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format
-    .. _`Confluent Schema Registry`:
-       https://docs.confluent.io/current/schema-registry/docs/index.html
     """
 
     def __init__(self, *, registry):
@@ -282,8 +277,9 @@ def pack_wire_format_prefix(schema_id):
 
     Notes
     -----
-    This function assumes that the "magic byte" is always ``0``. See
-    https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format
+    This function assumes that the "magic byte" is always ``0``. See the
+    `Confluent documentation
+    <https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format>`_
     for details about the wire format.
     """
     # 0 is the magic byte.
@@ -308,8 +304,9 @@ def unpack_wire_format_data(data):
 
     Notes
     -----
-    This function assumes that the "magic byte" is always ``0``. See
-    https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format
+    This function assumes that the "magic byte" is always ``0``. See the
+    `Confluent documentation
+    <https://docs.confluent.io/current/schema-registry/docs/serializer-formatter.html#wire-format>`_
     for details about the wire format.
     """
     if len(data) < 5:

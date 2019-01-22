@@ -7,7 +7,7 @@ See licenses/gidgethub.txt for license info.
 """
 
 __all__ = ('make_headers', 'decipher_response', 'decode_body', 'RegistryApi',
-           'SchemaCache')
+           'MockRegistryApi', 'SchemaCache', 'SubjectCache')
 
 import abc
 import json
@@ -86,7 +86,7 @@ def decode_body(content_type, body):
           object parsed from the JSON message.
         - If the content type isn't recognized, the body is decoded into a
           string.
-        - If the message is empty or ``content_type` is `None`, the returned
+        - If the message is empty or ``content_type`` is `None`, the returned
           value is `None`.
     """
     logger = logging.getLogger(__name__)
@@ -104,7 +104,7 @@ def decode_body(content_type, body):
         return decoded_body
 
 
-class RegistryApi(abc.ABC):
+class RegistryApi(metaclass=abc.ABCMeta):
     """A baseclass for Confluent Schema Registry clients.
     """
 
@@ -115,13 +115,13 @@ class RegistryApi(abc.ABC):
 
     @property
     def schema_cache(self):
-        """The schema cache (`SchemaCache`).
+        """The schema cache (`~kafkit.registry.sansio.SchemaCache`).
         """
         return self._schema_cache
 
     @property
     def subject_cache(self):
-        """The subject cache (`SubjectCache`).
+        """The subject cache (`~kafkit.registry.sansio.SubjectCache`).
         """
         return self._subject_cache
 
@@ -503,7 +503,7 @@ class RegistryApi(abc.ABC):
 
 
 class MockRegistryApi(RegistryApi):
-    """A mock implementation of the RegistryApi client that doens't do
+    """A mock implementation of the RegistryApi client that doensn't do
     network operations and provides attributes for introspection.
     """
 

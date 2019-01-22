@@ -4,7 +4,7 @@ This code and architecture is based on https://github.com/brettcannon/gidgethub
 See licenses/gidgethub.txt for info.
 """
 
-__all__ = ('RegistryApi')
+__all__ = ('RegistryApi',)
 
 from . import sansio
 
@@ -13,8 +13,8 @@ class RegistryApi(sansio.RegistryApi):
     """A Confluent Schema Registry client that uses aiohttp.
 
     Parameters
-    ---------
-    session : `aiohittp.ClientSession`
+    ----------
+    session : `aiohttp.ClientSession`
         An aiohttp client session.
     url : `str`
         The Confluent Schema Registry URL (e.g. http://registry:8081).
