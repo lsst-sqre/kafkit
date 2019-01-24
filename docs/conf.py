@@ -110,6 +110,8 @@ autodoc_default_flags = ["show-inheritance", "special-members"]
 
 linkcheck_retries = 2
 
+linkcheck_ignore = ['http://registry:8081']
+
 # -- Options for HTML output ----------------------------------------------
 
 templates_path = [
