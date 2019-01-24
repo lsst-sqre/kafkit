@@ -84,7 +84,27 @@ default_role = 'py:obj'
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
+    'aiohttp': ('https://aiohttp.readthedocs.io/en/stable/', None),
+    'aiokafka': ('https://aiokafka.readthedocs.io/en/stable/', None),
+    'fastavro': ('https://fastavro.readthedocs.io/en/latest/', None),
 }
+
+# This is added to the end of RST files - a good place to put substitutions
+# to be used globally.
+rst_epilog = """
+.. _Confluent Schema Registry: https://docs.confluent.io/current/schema-registry/docs/index.html
+.. _aiokafka: https://aiokafka.readthedocs.io/en/stable/
+.. _aiohttp: https://aiohttp.readthedocs.io/en/stable/
+"""
+
+# -- Options for linkcheck builder ----------------------------------------
+
+numpydoc_show_class_members = False
+autosummary_generate = True
+automodsumm_inherited_members = True
+autodoc_inherit_docstrings = True
+autoclass_content = "class"
+autodoc_default_flags = ["show-inheritance", "special-members"]
 
 # -- Options for linkcheck builder ----------------------------------------
 
