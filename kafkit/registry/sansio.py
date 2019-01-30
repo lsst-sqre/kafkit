@@ -570,7 +570,8 @@ class SchemaCache:
             except Exception:
                 # If the schema couldn't be parsed, its not going to be a
                 # valid key anyhow.
-                raise KeyError
+                raise KeyError('Key or schema not in the SchemaCache: '
+                               f'{key!r}')
             return self._schema_to_id[serialized_schema]
 
     def __contains__(self, key):
