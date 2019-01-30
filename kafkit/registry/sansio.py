@@ -765,7 +765,7 @@ class SubjectCache:
                 if schema is None:
                     raise ValueError(
                         'Trying to cache the schema ID for subject '
-                        f'{subject!r}, version {version}, but it\'s schema ID '
+                        f'{subject!r}, version {version}, but its schema ID '
                         f'({schema_id}) and schema are not in the schema '
                         'cache. Provide the schema as well as the schema_id.'
                     )
