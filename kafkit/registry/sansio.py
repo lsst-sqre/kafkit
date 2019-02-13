@@ -252,6 +252,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
             wrong with the server itself.
         """
         data = await self._make_request("PATCH", url, url_vars, data)
+        return data
 
     async def put(self, url, url_vars=dict(), data=b""):
         """Send an HTTP PUT request.
@@ -285,7 +286,8 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Raised if the server returns a 5XX status because something is
             wrong with the server itself.
         """
-        data = await self._make_request("PATCH", url, url_vars, data)
+        data = await self._make_request("PUT", url, url_vars, data)
+        return data
 
     async def delete(self, url, url_vars=dict(), *, data=b""):
         """Send an HTTP DELETE request.
@@ -320,6 +322,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
             wrong with the server itself.
         """
         data = await self._make_request("DELETE", url, url_vars, data)
+        return data
 
     @staticmethod
     def _prep_schema(schema):

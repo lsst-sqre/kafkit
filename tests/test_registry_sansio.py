@@ -121,6 +121,7 @@ async def test_registryapi_get_empty():
     # Check headers
     assert client.headers['accept'] == make_headers()['accept']
     assert client.headers['content-length'] == '0'
+    assert client.method == 'GET'
 
 
 @pytest.mark.asyncio
@@ -135,6 +136,64 @@ async def test_registryapi_get_json():
                                 url_vars={'subject': 'helloworld'})
 
     assert response == expected_data
+    assert client.method == 'GET'
+
+
+@pytest.mark.asyncio
+async def test_registryapi_post():
+    """Test RegistryApi.post().
+    """
+    expected_data = {'key': 'value'}
+    client = MockRegistryApi(
+        url='http://registry:8081',
+        body=json.dumps(expected_data).encode('utf-8'))
+    response = await client.post('/a{/b}', url_vars={'b': 'hello'}, data={})
+
+    assert response == expected_data
+    assert client.method == 'POST'
+    assert client.url == 'http://registry:8081/a/hello'
+
+
+@pytest.mark.asyncio
+async def test_registryapi_patch():
+    """Test RegistryApi.patch().
+    """
+    expected_data = {'key': 'value'}
+    client = MockRegistryApi(
+        url='http://registry:8081',
+        body=json.dumps(expected_data).encode('utf-8'))
+    response = await client.patch('/a{/b}', url_vars={'b': 'hello'}, data={})
+
+    assert response == expected_data
+    assert client.method == 'PATCH'
+    assert client.url == 'http://registry:8081/a/hello'
+
+
+@pytest.mark.asyncio
+async def test_registryapi_put():
+    """Test RegistryApi.put().
+    """
+    expected_data = {'key': 'value'}
+    client = MockRegistryApi(
+        url='http://registry:8081',
+        body=json.dumps(expected_data).encode('utf-8'))
+    response = await client.put('/a{/b}', url_vars={'b': 'hello'}, data={})
+
+    assert response == expected_data
+    assert client.method == 'PUT'
+    assert client.url == 'http://registry:8081/a/hello'
+
+
+@pytest.mark.asyncio
+async def test_registryapi_delete():
+    """Test RegistryApi.put().
+    """
+    client = MockRegistryApi(
+        url='http://registry:8081')
+    await client.delete('/a{/b}', url_vars={'b': 'hello'})
+
+    assert client.method == 'DELETE'
+    assert client.url == 'http://registry:8081/a/hello'
 
 
 @pytest.mark.asyncio
