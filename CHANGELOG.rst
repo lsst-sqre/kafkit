@@ -2,6 +2,17 @@
 Change log
 ##########
 
+0.1.1 (2019-02-13)
+==================
+
+Several fixes:
+
+- ``RegistryApi.put`` was doing a ``PATCH`` behind the scenes. That's fixed now.
+- The ``RegistryApi.put``, ``patch``, and ``delete`` methods weren't returning data. That's fixed now as well.
+- All of the RegistryApi's low-level HTTP methods have more thorough unit testing now to avoid these issues in the future.
+
+:jirab:`DM-17879`
+
 0.1.0 (2019-01-30)
 ==================
 
