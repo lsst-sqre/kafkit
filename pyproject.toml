@@ -33,6 +33,11 @@ commands =
     coverage combine
     coverage report
 
+[testenv:typing]
+description = Run mypy.
+commands =
+    mypy src/kafkit tests setup.py
+
 [testenv:lint]
 description = Lint codebase by running pre-commit (Black, isort, Flake8).
 skip_install = true

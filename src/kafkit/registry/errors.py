@@ -8,6 +8,8 @@ __all__ = [
     "RegistryBrokenError",
 ]
 
+from typing import Any, Optional
+
 
 class RegistryError(Exception):
     """Base exception for Registry errors."""
@@ -22,15 +24,21 @@ class RegistryHttpError(RegistryError):
         The HTTP status code.
     *args
         A custom, arbitrary, error message. Setting this overrides ``message``.
-    error_code : `int`
+    error_code : `int`, optional
         The Confluent Schema Registry error code. See
         https://docs.confluent.io/current/schema-registry/docs/api.html#errors
-    message : `str`
+    message : `str`, optional
         The error message, intended to be the ``message`` field in Schema
         Registry error responses.
     """
 
-    def __init__(self, status_code, *args, error_code=None, message=None):
+    def __init__(
+        self,
+        status_code: int,
+        *args: Any,
+        error_code: Optional[int] = None,
+        message: Optional[str] = None,
+    ) -> None:
         self.status_code = status_code
         self.error_code = error_code
         self.message = message

@@ -6,19 +6,12 @@ https://github.com/brettcannon/gidgethub and https://sans-io.readthedocs.io.
 See licenses/gidgethub.txt for license info.
 """
 
-__all__ = [
-    "make_headers",
-    "decipher_response",
-    "decode_body",
-    "RegistryApi",
-    "MockRegistryApi",
-    "SchemaCache",
-    "SubjectCache",
-]
+from __future__ import annotations
 
 import abc
 import json
 import logging
+from typing import Any, Dict, Mapping, Optional, Tuple, Union, overload
 
 import fastavro
 
@@ -30,8 +23,18 @@ from kafkit.registry.errors import (
     RegistryRedirectionError,
 )
 
+__all__ = [
+    "make_headers",
+    "decipher_response",
+    "decode_body",
+    "RegistryApi",
+    "MockRegistryApi",
+    "SchemaCache",
+    "SubjectCache",
+]
 
-def make_headers():
+
+def make_headers() -> Dict[str, str]:
     """Make HTTP headers for the Confluent Schema Registry.
 
     Returns
@@ -44,7 +47,9 @@ def make_headers():
     return headers
 
 
-def decipher_response(status_code, headers, body):
+def decipher_response(
+    status_code: int, headers: Mapping[str, str], body: bytes
+) -> Any:
     """Process a response."""
     data = decode_body(headers.get("content-type"), body)
 
@@ -74,12 +79,12 @@ def decipher_response(status_code, headers, body):
             raise RegistryHttpError(status_code=status_code)
 
 
-def decode_body(content_type, body):
+def decode_body(content_type: Optional[str], body: bytes) -> Any:
     """Decode an HTTP body based on the specified content type.
 
     Parameters
     ----------
-    content_type : `str`
+    content_type : `str` or `None`
         Content type string, from the response header.
     body : `bytes`
         Bytes content of the body.
@@ -116,26 +121,43 @@ def decode_body(content_type, body):
 class RegistryApi(metaclass=abc.ABCMeta):
     """A baseclass for Confluent Schema Registry clients."""
 
-    def __init__(self, *, url):
+    def __init__(self, *, url: str) -> None:
         self.url = url
         self._schema_cache = SchemaCache()
         self._subject_cache = SubjectCache(self._schema_cache)
 
     @property
-    def schema_cache(self):
+    def schema_cache(self) -> SchemaCache:
         """The schema cache (`~kafkit.registry.sansio.SchemaCache`)."""
         return self._schema_cache
 
     @property
-    def subject_cache(self):
+    def subject_cache(self) -> SubjectCache:
         """The subject cache (`~kafkit.registry.sansio.SubjectCache`)."""
         return self._subject_cache
 
     @abc.abstractmethod
-    async def _request(self, method, url, headers, body):
-        """Make an HTTP request."""
+    async def _request(
+        self, method: str, url: str, headers: Mapping[str, str], body: bytes
+    ) -> Tuple[int, Mapping[str, str], bytes]:
+        """Make an HTTP request.
 
-    async def _make_request(self, method, url, url_vars, data):
+        Parameters
+        ----------
+        method : `str`
+            An HTTP method (GET, POST, PUT, PATCH, DELETE).
+        url : `str`
+            A URL.
+        headers : `dict`
+            Headers to include in the request, a mapping of string key to
+            string value.
+        body : `bytes`
+            Description
+        """
+
+    async def _make_request(
+        self, method: str, url: str, url_vars: Mapping[str, str], data: Any
+    ) -> Any:
         """Construct and make an HTTP request."""
         expanded_url = format_url(host=self.url, url=url, url_vars=url_vars)
         request_headers = make_headers()
@@ -157,7 +179,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         response_data = decipher_response(*response)
         return response_data
 
-    async def get(self, url, url_vars=dict()):
+    async def get(self, url: str, url_vars: Mapping[str, str] = dict()) -> Any:
         """Send an HTTP GET request.
 
         Parameters
@@ -190,7 +212,9 @@ class RegistryApi(metaclass=abc.ABCMeta):
         data = await self._make_request("GET", url, url_vars, b"")
         return data
 
-    async def post(self, url, url_vars=dict(), *, data):
+    async def post(
+        self, url: str, url_vars: Mapping[str, str] = dict(), *, data: Any
+    ) -> Any:
         """Send an HTTP POST request.
 
         Parameters
@@ -225,7 +249,9 @@ class RegistryApi(metaclass=abc.ABCMeta):
         data = await self._make_request("POST", url, url_vars, data)
         return data
 
-    async def patch(self, url, url_vars=dict(), *, data):
+    async def patch(
+        self, url: str, url_vars: Mapping[Any, Any] = dict(), *, data: Any
+    ) -> Any:
         """Send an HTTP PATCH request.
 
         Parameters
@@ -260,7 +286,9 @@ class RegistryApi(metaclass=abc.ABCMeta):
         data = await self._make_request("PATCH", url, url_vars, data)
         return data
 
-    async def put(self, url, url_vars=dict(), data=b""):
+    async def put(
+        self, url: str, url_vars: Mapping[str, str] = dict(), data: Any = b""
+    ) -> Any:
         """Send an HTTP PUT request.
 
         Parameters
@@ -295,7 +323,13 @@ class RegistryApi(metaclass=abc.ABCMeta):
         data = await self._make_request("PUT", url, url_vars, data)
         return data
 
-    async def delete(self, url, url_vars=dict(), *, data=b""):
+    async def delete(
+        self,
+        url: str,
+        url_vars: Mapping[str, str] = dict(),
+        *,
+        data: Any = b"",
+    ) -> Any:
         """Send an HTTP DELETE request.
 
         Parameters
@@ -331,19 +365,21 @@ class RegistryApi(metaclass=abc.ABCMeta):
         return data
 
     @staticmethod
-    def _prep_schema(schema):
+    def _prep_schema(schema: Mapping[str, Any]) -> str:
         """Prep a schema for submission through an API request by
         removing any fastavro hints and dumping to a string.
         """
-        schema = schema.copy()
+        schema = dict(schema)  # make a copy
         try:
             del schema["__fastavro_parsed"]
         except KeyError:
             pass
         # sort keys for repeatable tests
-        return json.dumps(schema, sort_keys="true")
+        return json.dumps(schema, sort_keys=True)
 
-    async def register_schema(self, schema, subject=None):
+    async def register_schema(
+        self, schema: Mapping[str, Any], subject: Optional[str] = None
+    ) -> int:
         """Register a schema or get the ID of an existing schema.
 
         Wraps ``POST /subjects/(string: subject)/versions``.
@@ -399,7 +435,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         return result["id"]
 
-    async def get_schema_by_id(self, schema_id):
+    async def get_schema_by_id(self, schema_id: int) -> Dict[str, Any]:
         """Get a schema from the registry given its ID.
 
         Wraps ``GET /schemas/ids/{int: id}``.
@@ -442,7 +478,9 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         return schema
 
-    async def get_schema_by_subject(self, subject, version="latest"):
+    async def get_schema_by_subject(
+        self, subject: str, version: Union[str, int] = "latest"
+    ) -> Dict[str, Any]:
         """Get a schema for a subject in the registry.
 
         Wraps ``GET /subjects/(string: subject)/versions/(versionId: version)``
@@ -527,22 +565,24 @@ class MockRegistryApi(RegistryApi):
 
     def __init__(
         self,
-        url="http://registry:8081",
-        status_code=200,
-        headers=None,
-        body=b"",
-    ):
+        url: str = "http://registry:8081",
+        status_code: int = 200,
+        headers: Mapping[str, str] = None,
+        body: Any = b"",
+    ) -> None:
         super().__init__(url=url)
         self.response_code = status_code
         self.response_headers = headers if headers else self.DEFAULT_HEADERS
         self.response_body = body
 
-    async def _request(self, method, url, headers, body):
+    async def _request(
+        self, method: str, url: str, headers: Mapping[str, str], body: bytes
+    ) -> Any:
         self.method = method
         self.url = url
         self.headers = headers
         self.body = body
-        response_headers = self.response_headers.copy()
+        response_headers = dict(self.response_headers)  # make a copy
         return self.response_code, response_headers, self.response_body
 
 
@@ -556,11 +596,11 @@ class SchemaCache:
     schema itself.
     """
 
-    def __init__(self):
-        self._id_to_schema = {}
-        self._schema_to_id = {}
+    def __init__(self) -> None:
+        self._id_to_schema: Dict[int, str] = {}
+        self._schema_to_id: Dict[str, int] = {}
 
-    def insert(self, schema, schema_id):
+    def insert(self, schema: Mapping[str, Any], schema_id: int) -> None:
         """Insert a schema into the cache.
 
         Parameters
@@ -577,13 +617,23 @@ class SchemaCache:
         self._id_to_schema[schema_id] = serialized_schema
         self._schema_to_id[serialized_schema] = schema_id
 
-    def __getitem__(self, key):
+    @overload
+    def __getitem__(self, key: int) -> Dict[str, Any]:
+        ...
+
+    @overload  # noqa: F811 remove for pyflakes 2.2.x
+    def __getitem__(self, key: Mapping[str, Any]) -> int:  # noqa: F811
+        ...
+
+    def __getitem__(  # noqa: F811 remove for pyflakes 2.2.x
+        self, key: Union[Mapping[str, Any], int]
+    ) -> Union[Dict[str, Any], int]:
         if isinstance(key, int):
             return json.loads(self._id_to_schema[key])
         else:
             # Key must be a schema
             # Always ensure the schema is parsed
-            schema = key.copy()
+            schema = dict(key)  # make a copy
             try:
                 serialized_schema = SchemaCache._serialize_schema(schema)
             except Exception:
@@ -594,7 +644,7 @@ class SchemaCache:
                 )
             return self._schema_to_id[serialized_schema]
 
-    def __contains__(self, key):
+    def __contains__(self, key: Union[int, Mapping[str, Any]]) -> bool:
         try:
             self[key]
         except KeyError:
@@ -602,7 +652,7 @@ class SchemaCache:
         return True
 
     @staticmethod
-    def _serialize_schema(schema):
+    def _serialize_schema(schema: Mapping[str, Any]) -> str:
         """Predictably serialize the schema so that it's hashable.
         """
         schema = fastavro.parse_schema(schema)
@@ -628,12 +678,12 @@ class SubjectCache:
     the schema and schema ID into the member `SchemaCache`.
     """
 
-    def __init__(self, schema_cache):
+    def __init__(self, schema_cache: SchemaCache) -> None:
         self.schema_cache = schema_cache
 
-        self._subject_to_id = {}
+        self._subject_to_id: Dict[Tuple[str, int], int] = {}
 
-    def get_id(self, subject, version):
+    def get_id(self, subject: str, version: int) -> int:
         """Get the schema ID of a subject version.
 
         Parameters
@@ -663,7 +713,7 @@ class SubjectCache:
         except KeyError as e:
             raise ValueError from e
 
-    def get_schema(self, subject, version):
+    def get_schema(self, subject: str, version: int) -> Dict[str, Any]:
         """Get the schema of a subject version.
 
         Parameters
@@ -689,11 +739,12 @@ class SubjectCache:
         get
         """
         try:
-            return self.schema_cache[self.get_id(subject, version)]
+            schema = self.schema_cache[self.get_id(subject, version)]
+            return schema
         except KeyError as e:
             raise ValueError from e
 
-    def get(self, subject, version):
+    def get(self, subject: str, version: Union[int, str]) -> Dict[str, Any]:
         """Get the full set of schema and ID information for a subject version.
 
         Parameters
@@ -701,7 +752,8 @@ class SubjectCache:
         subject : `str`
             The name of the subject.
         version : `int`
-            The version number of the schema in the subject.
+            The version number of the schema in the subject. If version is
+            given as a string (``"latest"``), a `ValueError` is raised.
 
         Returns
         -------
@@ -728,6 +780,8 @@ class SubjectCache:
         get_id
         get_schema
         """
+        if not isinstance(version, int):
+            raise ValueError("version must be an int, got {}".format(version))
         try:
             schema_id = self.get_id(subject, version)
             schema = self.schema_cache[schema_id]
@@ -743,7 +797,13 @@ class SubjectCache:
             "schema": schema,
         }
 
-    def insert(self, subject, version, schema_id=None, schema=None):
+    def insert(
+        self,
+        subject: str,
+        version: int,
+        schema_id: Optional[int] = None,
+        schema: Optional[Mapping[str, Any]] = None,
+    ) -> None:
         """Insert a subject version into the cache.
 
         Parameters
@@ -803,14 +863,14 @@ class SubjectCache:
                         "and schema are not in the schema cache. Provide the "
                         "schema argument as well as schema_id."
                     )
-                self.schema_cache.insert(schema, schema_id)
-            schema_id = self.schema_cache[schema]
-            self._subject_to_id[(subject, version)] = schema_id
+
+            _schema_id = self.schema_cache[schema]
+            self._subject_to_id[(subject, version)] = _schema_id
 
         else:
             raise ValueError(
                 "Provide either a schema_id or schema argument (or both)."
             )
 
-    def __contains__(self, key):
+    def __contains__(self, key: Tuple[str, int]) -> bool:
         return key in self._subject_to_id

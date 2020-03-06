@@ -16,7 +16,7 @@ from kafkit.registry.serializer import (
 )
 
 
-def test_wire_format():
+def test_wire_format() -> None:
     """Test packing and unpacking the wire format prefix."""
     schema_id = 123
     body = b"hello"
@@ -30,13 +30,13 @@ def test_wire_format():
     assert body == unpacked_body
 
 
-def test_unpacking_short_message():
+def test_unpacking_short_message() -> None:
     with pytest.raises(RuntimeError):
         unpack_wire_format_data(b"")
 
 
 @pytest.mark.asyncio
-async def test_serializer():
+async def test_serializer() -> None:
     """Test the Serializer class."""
     client = MockRegistryApi(body=json.dumps({"id": 1}).encode("utf-8"))
     schema1 = {
@@ -68,7 +68,7 @@ async def test_serializer():
 
 
 @pytest.mark.asyncio
-async def test_deserializer():
+async def test_deserializer() -> None:
     """Test the Deserializer class."""
     # First schema
     schema1 = {
@@ -124,7 +124,7 @@ async def test_deserializer():
 
 
 @pytest.mark.asyncio
-async def test_polyserializer_given_id():
+async def test_polyserializer_given_id() -> None:
     """Test the PolySerializer class, given schema IDs."""
     # First schema
     schema1 = {
@@ -174,7 +174,7 @@ async def test_polyserializer_given_id():
 
 
 @pytest.mark.asyncio
-async def test_polyserializer_given_schema():
+async def test_polyserializer_given_schema() -> None:
     """Test the PolyySerializer class, given a schema itself."""
     schema = {
         "type": "record",

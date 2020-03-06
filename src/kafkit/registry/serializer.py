@@ -2,16 +2,23 @@
 Confluent Schema Registry.
 """
 
+from __future__ import annotations
+
+import struct
+from io import BytesIO
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
+
+import fastavro
+
 __all__ = [
     "Serializer",
     "PolySerializer",
     "Deserializer",
 ]
 
-import struct
-from io import BytesIO
 
-import fastavro
+if TYPE_CHECKING:
+    from kafit.registry.sansio import RegistryApi
 
 
 class Serializer:
@@ -63,12 +70,18 @@ class Serializer:
     https://aiokafka.readthedocs.io/en/stable/examples/serialize_and_compress.html
     """
 
-    def __init__(self, *, schema, schema_id):
+    def __init__(self, *, schema: Dict[str, Any], schema_id: int) -> None:
         self.schema = fastavro.parse_schema(schema)
         self.id = schema_id
 
     @classmethod
-    async def register(cls, *, registry, schema, subject=None):
+    async def register(
+        cls,
+        *,
+        registry: RegistryApi,
+        schema: Dict[str, Any],
+        subject: Optional[str] = None,
+    ) -> Serializer:
         """Create a serializer ensuring that the schema is registered with the
         schema registry.
 
@@ -100,7 +113,7 @@ class Serializer:
         id_ = await registry.register_schema(schema, subject=subject)
         return cls(schema=schema, schema_id=id_)
 
-    def __call__(self, data):
+    def __call__(self, data: Any) -> bytes:
         """Serialize a dataset in the Confluent Schema Registry Wire format,
         which is an Avro-encoded message with a schema-identifying prefix.
 
@@ -127,10 +140,16 @@ class PolySerializer:
         A registry client.
     """
 
-    def __init__(self, *, registry):
+    def __init__(self, *, registry: RegistryApi) -> None:
         self._registry = registry
 
-    async def serialize(self, data, schema=None, schema_id=None, subject=None):
+    async def serialize(
+        self,
+        data: Any,
+        schema: Optional[Dict[str, Any]] = None,
+        schema_id: Optional[int] = None,
+        subject: Optional[str] = None,
+    ) -> bytes:
         """Serialize data given a schema.
 
         Parameters
@@ -168,12 +187,14 @@ class PolySerializer:
             schema_id = await self._registry.register_schema(
                 schema=schema, subject=subject
             )
-        else:
+        if schema is None or schema_id is None:
             raise RuntimeError("Pass either a schema or schema_id parameter.")
         return _make_message(data=data, schema_id=schema_id, schema=schema)
 
 
-def _make_message(*, schema_id, schema, data):
+def _make_message(
+    *, schema_id: int, schema: Dict[str, Any], data: Any
+) -> bytes:
     """Make a message in the Confluent Wire Format.
     """
     message_fh = BytesIO()
@@ -223,10 +244,12 @@ class Deserializer:
     `~Deserializer.deserialize` manually on by bytes obtained by the consumer.
     """
 
-    def __init__(self, *, registry):
+    def __init__(self, *, registry: RegistryApi) -> None:
         self._registry = registry
 
-    async def deserialize(self, data, include_schema=False):
+    async def deserialize(
+        self, data: bytes, include_schema: bool = False
+    ) -> Dict[str, Any]:
         """Deserialize a message.
 
         Parameters
@@ -267,7 +290,7 @@ class Deserializer:
         return result
 
 
-def pack_wire_format_prefix(schema_id):
+def pack_wire_format_prefix(schema_id: int) -> bytes:
     """Create the bytes prefix for a Confluent Wire Format message.
 
     Parameters
@@ -291,7 +314,7 @@ def pack_wire_format_prefix(schema_id):
     return struct.pack(">bI", 0, schema_id)
 
 
-def unpack_wire_format_data(data):
+def unpack_wire_format_data(data: bytes) -> Tuple[int, bytes]:
     """Unpackage the bytes of a Confluent Wire Format message to get the
     schema ID and message body.
 

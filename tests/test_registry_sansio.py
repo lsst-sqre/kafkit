@@ -18,13 +18,13 @@ from kafkit.registry.sansio import (
 )
 
 
-def test_make_headers():
+def test_make_headers() -> None:
     headers = make_headers()
 
     assert headers["accept"] == "application/vnd.schemaregistry.v1+json"
 
 
-def test_decipher_response_200():
+def test_decipher_response_200() -> None:
     status = 200
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     data = [1, 2, 3]
@@ -33,7 +33,7 @@ def test_decipher_response_200():
     assert returned_data == data
 
 
-def test_decipher_response_200_empty():
+def test_decipher_response_200_empty() -> None:
     status = 200
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -41,7 +41,7 @@ def test_decipher_response_200_empty():
     assert returned_data is None
 
 
-def test_decipher_response_500_no_message():
+def test_decipher_response_500_no_message() -> None:
     status = 500
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -49,7 +49,7 @@ def test_decipher_response_500_no_message():
         decipher_response(status, headers, body)
 
 
-def test_decipher_response_500_with_message():
+def test_decipher_response_500_with_message() -> None:
     status = 500
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = json.dumps({"error": 12345, "message": "I've got reasons"}).encode(
@@ -59,7 +59,7 @@ def test_decipher_response_500_with_message():
         decipher_response(status, headers, body)
 
 
-def test_decipher_response_401_no_message():
+def test_decipher_response_401_no_message() -> None:
     status = 401
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -67,7 +67,7 @@ def test_decipher_response_401_no_message():
         decipher_response(status, headers, body)
 
 
-def test_decipher_response_401_with_message():
+def test_decipher_response_401_with_message() -> None:
     status = 401
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = json.dumps({"error": 12345, "message": "I've got reasons"}).encode(
@@ -77,7 +77,7 @@ def test_decipher_response_401_with_message():
         decipher_response(status, headers, body)
 
 
-def test_decipher_response_301_no_message():
+def test_decipher_response_301_no_message() -> None:
     status = 301
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -85,7 +85,7 @@ def test_decipher_response_301_no_message():
         decipher_response(status, headers, body)
 
 
-def test_decipher_response_301_with_message():
+def test_decipher_response_301_with_message() -> None:
     status = 301
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = json.dumps({"error": 12345, "message": "I've got reasons"}).encode(
@@ -96,7 +96,7 @@ def test_decipher_response_301_with_message():
 
 
 @pytest.mark.asyncio
-async def test_registryapi_get_empty():
+async def test_registryapi_get_empty() -> None:
     """Test client with a regular GET call with empty response."""
     client = MockRegistryApi(url="http://registry:8081")
     response = await client.get(
@@ -113,7 +113,7 @@ async def test_registryapi_get_empty():
 
 
 @pytest.mark.asyncio
-async def test_registryapi_get_json():
+async def test_registryapi_get_json() -> None:
     """Test client with a regular GET call with a JSON response."""
     expected_data = {"hello": "world"}
     client = MockRegistryApi(
@@ -129,7 +129,7 @@ async def test_registryapi_get_json():
 
 
 @pytest.mark.asyncio
-async def test_registryapi_post():
+async def test_registryapi_post() -> None:
     """Test RegistryApi.post()."""
     expected_data = {"key": "value"}
     client = MockRegistryApi(
@@ -144,7 +144,7 @@ async def test_registryapi_post():
 
 
 @pytest.mark.asyncio
-async def test_registryapi_patch():
+async def test_registryapi_patch() -> None:
     """Test RegistryApi.patch()."""
     expected_data = {"key": "value"}
     client = MockRegistryApi(
@@ -159,7 +159,7 @@ async def test_registryapi_patch():
 
 
 @pytest.mark.asyncio
-async def test_registryapi_put():
+async def test_registryapi_put() -> None:
     """Test RegistryApi.put()."""
     expected_data = {"key": "value"}
     client = MockRegistryApi(
@@ -174,7 +174,7 @@ async def test_registryapi_put():
 
 
 @pytest.mark.asyncio
-async def test_registryapi_delete():
+async def test_registryapi_delete() -> None:
     """Test RegistryApi.put().
     """
     client = MockRegistryApi(url="http://registry:8081")
@@ -185,7 +185,7 @@ async def test_registryapi_delete():
 
 
 @pytest.mark.asyncio
-async def test_register_schema():
+async def test_register_schema() -> None:
     """Test the RegistryApi.register_schema() method."""
     input_schema = {
         "type": "record",
@@ -214,8 +214,10 @@ async def test_register_schema():
     assert sent_schema["name"] == "test-schemas.schema1"
 
     # Check that the schema is in the cache and is parsed
-    assert client.schema_cache[1]["name"] == "test-schemas.schema1"
-    assert "__fastavro_parsed" in client.schema_cache[1]
+    # Value of type "Union[int, Dict[str, Any]]" is not indexable
+    cached_schema = client.schema_cache[1]
+    assert cached_schema["name"] == "test-schemas.schema1"
+    assert "__fastavro_parsed" in cached_schema
 
     # Make a second call to get the schema out
     new_schema_id = await client.register_schema(input_schema)
@@ -223,7 +225,7 @@ async def test_register_schema():
 
 
 @pytest.mark.asyncio
-async def test_get_schema_by_id():
+async def test_get_schema_by_id() -> None:
     """Test the RegistryApi.get_schema_by_id method."""
     # Body that we expect the registry API to return given the request.
     input_schema = json.dumps(
@@ -242,10 +244,11 @@ async def test_get_schema_by_id():
 
     # Check that the schema was parsed
     assert schema["name"] == "test-schemas.schema1"
-    assert "__fastavro_parsed" in client.schema_cache[1]
+    cached_schema = client.schema_cache[1]
+    assert "__fastavro_parsed" in cached_schema
 
     # Check that the schem was cached
-    assert client.schema_cache[1]["name"] == "test-schemas.schema1"
+    assert cached_schema["name"] == "test-schemas.schema1"
 
     # Check the request
     assert client.url == "http://registry:8081/schemas/ids/1"
@@ -253,7 +256,7 @@ async def test_get_schema_by_id():
 
 
 @pytest.mark.asyncio
-async def test_get_schema_by_subject():
+async def test_get_schema_by_subject() -> None:
     """Test the RegistryApi.get_schema_by_subject method."""
     # Body that we expect the registry API to return given the request.
     expected_body = {
@@ -296,7 +299,7 @@ async def test_get_schema_by_subject():
     assert result == result2
 
 
-def test_schema_cache():
+def test_schema_cache() -> None:
     cache = SchemaCache()
 
     schema1 = {
@@ -318,8 +321,10 @@ def test_schema_cache():
 
     # test not only that you get the schemas by ID, but that it was
     # parsed by fastavro
-    assert cache[1]["name"] == "test-schemas.schema1"
-    assert cache[2]["name"] == "test-schemas.schema2"
+    cached_schema1 = cache[1]
+    cached_schema2 = cache[2]
+    assert cached_schema1["name"] == "test-schemas.schema1"
+    assert cached_schema2["name"] == "test-schemas.schema2"
 
     # Get schemas by the schema itself
     assert cache[schema1] == 1
@@ -333,7 +338,7 @@ def test_schema_cache():
         cache[schemaX]
 
 
-def test_subject_cache():
+def test_subject_cache() -> None:
     cache = SubjectCache(SchemaCache())
 
     schema1 = {
@@ -399,4 +404,4 @@ def test_subject_cache():
 
     # Test caching 'latest'
     with pytest.raises(TypeError):
-        cache.insert("mysubject", "latest", schema_id=42)
+        cache.insert("mysubject", "latest", schema_id=42)  # type: ignore

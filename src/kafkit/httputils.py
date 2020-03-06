@@ -7,12 +7,13 @@ This code is based on on the sans-io code of Gidgethub
 __all__ = ["format_url", "parse_content_type"]
 
 import cgi
-import urllib
+import urllib.parse
+from typing import Mapping, Optional, Tuple
 
 import uritemplate
 
 
-def format_url(*, host, url, url_vars):
+def format_url(*, host: str, url: str, url_vars: Mapping[str, str]) -> str:
     """Construct a URL by merging host, path, and variables.
 
     Parameters
@@ -37,14 +38,16 @@ def format_url(*, host, url, url_vars):
     return uritemplate.expand(url, **url_vars)
 
 
-def parse_content_type(content_type):
+def parse_content_type(
+    content_type: Optional[str],
+) -> Tuple[Optional[str], str]:
     """Tease out the content-type and character encoding.
 
     A default character encoding of UTF-8 is used, so the content-type
     must be used to determine if any decoding is necessary to begin
     with.
     """
-    if not content_type:
+    if content_type is None:
         return None, "utf-8"
     else:
         type_, parameters = cgi.parse_header(content_type)

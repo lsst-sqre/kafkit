@@ -1,5 +1,7 @@
 """Tests for the kafkit.utils module."""
 
+from typing import Dict
+
 import pytest
 
 from kafkit.httputils import format_url
@@ -34,5 +36,7 @@ from kafkit.httputils import format_url
         ),
     ],
 )
-def test_format_url(host, url, url_vars, expected):
+def test_format_url(
+    host: str, url: str, url_vars: Dict[str, str], expected: str
+) -> None:
     assert expected == format_url(host=host, url=url, url_vars=url_vars)
