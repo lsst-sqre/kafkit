@@ -7,3 +7,31 @@ requires = [
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
+
+[tool.black]
+line-length = 79
+target-version = ['py37']
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | build
+  | dist
+)/
+'''
+# Use single-quoted strings so TOML treats the string like a Python r-string
+# Multi-line strings are implicitly treated by black as regular expressions
+
+[tool.isort]
+include_trailing_comma = true
+multi_line_output = 3
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 79
+known_first_party = "kafkit"
+known_third_party = ["fastavro", "pytest", "setuptools", "uritemplate"]
+skip = ["docs/conf.py"]
