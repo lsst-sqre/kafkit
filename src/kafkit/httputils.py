@@ -4,7 +4,7 @@ This code is based on on the sans-io code of Gidgethub
 (https://github.com/brettcannon/gidgethub) and generalized for Kafkit.
 """
 
-__all__ = ('format_url', 'parse_content_type')
+__all__ = ["format_url", "parse_content_type"]
 
 import cgi
 import urllib

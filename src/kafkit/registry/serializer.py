@@ -2,10 +2,14 @@
 Confluent Schema Registry.
 """
 
-__all__ = ('Serializer', 'PolySerializer', 'Deserializer',)
+__all__ = [
+    "Serializer",
+    "PolySerializer",
+    "Deserializer",
+]
 
-from io import BytesIO
 import struct
+from io import BytesIO
 
 import fastavro
 
@@ -162,9 +166,10 @@ class PolySerializer:
             schema = await self._registry.get_schema_by_id(schema_id)
         elif schema is not None:
             schema_id = await self._registry.register_schema(
-                schema=schema, subject=subject)
+                schema=schema, subject=subject
+            )
         else:
-            raise RuntimeError('Pass either a schema or schema_id parameter.')
+            raise RuntimeError("Pass either a schema or schema_id parameter.")
         return _make_message(data=data, schema_id=schema_id, schema=schema)
 
 
@@ -256,9 +261,9 @@ class Deserializer:
         message_fh = BytesIO(message_data)
         message_fh.seek(0)
         message = fastavro.schemaless_reader(message_fh, schema)
-        result = {'id': schema_id, 'message': message}
+        result = {"id": schema_id, "message": message}
         if include_schema:
-            result['schema'] = schema
+            result["schema"] = schema
         return result
 
 
@@ -283,7 +288,7 @@ def pack_wire_format_prefix(schema_id):
     for details about the wire format.
     """
     # 0 is the magic byte.
-    return struct.pack('>bI', 0, schema_id)
+    return struct.pack(">bI", 0, schema_id)
 
 
 def unpack_wire_format_data(data):
@@ -310,10 +315,11 @@ def unpack_wire_format_data(data):
     for details about the wire format.
     """
     if len(data) < 5:
-        raise RuntimeError(f'Data is too short, length is {len(data)} '
-                           'bytes. Must be >= 5.')
+        raise RuntimeError(
+            f"Data is too short, length is {len(data)} " "bytes. Must be >= 5."
+        )
     prefix = data[:5]
 
     # Interpret the Confluent Wire Format prefix
-    _, schema_id = struct.unpack('>bI', prefix)
+    _, schema_id = struct.unpack(">bI", prefix)
     return schema_id, data[5:]

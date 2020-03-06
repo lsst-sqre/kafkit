@@ -4,9 +4,9 @@ This code and architecture is based on https://github.com/brettcannon/gidgethub
 See licenses/gidgethub.txt for info.
 """
 
-__all__ = ('RegistryApi',)
+__all__ = ["RegistryApi"]
 
-from . import sansio
+from kafkit.registry import sansio
 
 
 class RegistryApi(sansio.RegistryApi):
@@ -26,5 +26,6 @@ class RegistryApi(sansio.RegistryApi):
 
     async def _request(self, method, url, headers, body):
         async with self._session.request(
-                method, url, headers=headers, data=body) as response:
+            method, url, headers=headers, data=body
+        ) as response:
             return response.status, response.headers, await response.read()

@@ -1,13 +1,16 @@
-"""Exceptions classes for the Registry client.
-"""
+"""Exceptions classes for the Registry client."""
 
-__all__ = ('RegistryError', 'RegistryHttpError', 'RegistryRedirectionError',
-           'RegistryBadRequestError', 'RegistryBrokenError')
+__all__ = [
+    "RegistryError",
+    "RegistryHttpError",
+    "RegistryRedirectionError",
+    "RegistryBadRequestError",
+    "RegistryBrokenError",
+]
 
 
 class RegistryError(Exception):
-    """Base exception for Registry errors.
-    """
+    """Base exception for Registry errors."""
 
 
 class RegistryHttpError(RegistryError):
@@ -34,21 +37,19 @@ class RegistryHttpError(RegistryError):
 
         if message:
             super().__init__(
-                f'Registry error ({status_code:d}). {error_code} - {message}')
+                f"Registry error ({status_code:d}). {error_code} - {message}"
+            )
         else:
             super().__init__(*args)
 
 
 class RegistryRedirectionError(RegistryHttpError):
-    """An exception for 3XX responses.
-    """
+    """An exception for 3XX responses."""
 
 
 class RegistryBadRequestError(RegistryHttpError):
-    """An exception if the request is invalid (4XX errors).
-    """
+    """An exception if the request is invalid (4XX errors)."""
 
 
 class RegistryBrokenError(RegistryHttpError):
-    """An excpetion if the server is down (5XX errors).
-    """
+    """An excpetion if the server is down (5XX errors)."""

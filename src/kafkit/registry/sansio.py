@@ -6,8 +6,15 @@ https://github.com/brettcannon/gidgethub and https://sans-io.readthedocs.io.
 See licenses/gidgethub.txt for license info.
 """
 
-__all__ = ('make_headers', 'decipher_response', 'decode_body', 'RegistryApi',
-           'MockRegistryApi', 'SchemaCache', 'SubjectCache')
+__all__ = [
+    "make_headers",
+    "decipher_response",
+    "decode_body",
+    "RegistryApi",
+    "MockRegistryApi",
+    "SchemaCache",
+    "SubjectCache",
+]
 
 import abc
 import json
@@ -17,8 +24,11 @@ import fastavro
 
 from kafkit.httputils import format_url, parse_content_type
 from kafkit.registry.errors import (
-    RegistryRedirectionError, RegistryBadRequestError, RegistryBrokenError,
-    RegistryHttpError)
+    RegistryBadRequestError,
+    RegistryBrokenError,
+    RegistryHttpError,
+    RegistryRedirectionError,
+)
 
 
 def make_headers():
@@ -30,15 +40,12 @@ def make_headers():
         A dictionary of HTTP headers for a Confluent Schema Registry request.
         All keys are normalized to lowercase for consistency.
     """
-    headers = {
-        'accept': 'application/vnd.schemaregistry.v1+json'
-    }
+    headers = {"accept": "application/vnd.schemaregistry.v1+json"}
     return headers
 
 
 def decipher_response(status_code, headers, body):
-    """Process a response.
-    """
+    """Process a response."""
     data = decode_body(headers.get("content-type"), body)
 
     if status_code in (200, 201, 204):
@@ -47,20 +54,20 @@ def decipher_response(status_code, headers, body):
         # Process an error. First try to get the error message from the
         # response and then raise an appropriate exception.
         try:
-            error_code = data['error_code']
-            message = data['message']
+            error_code = data["error_code"]
+            message = data["message"]
         except (TypeError, KeyError):
             error_code = None
             message = None
 
         if status_code >= 500:
             raise RegistryBrokenError(
-                status_code=status_code, error_code=error_code,
-                message=message)
+                status_code=status_code, error_code=error_code, message=message
+            )
         elif status_code >= 400:
             raise RegistryBadRequestError(
-                status_code=status_code, error_code=error_code,
-                message=message)
+                status_code=status_code, error_code=error_code, message=message
+            )
         elif status_code >= 300:
             raise RegistryRedirectionError(status_code=status_code)
         else:
@@ -94,19 +101,20 @@ def decode_body(content_type, body):
     if not len(body) or not content_type:
         return None
     decoded_body = body.decode(encoding)
-    if type_ in ('application/vnd.schemaregistry.v1+json', 'application/json'):
+    if type_ in ("application/vnd.schemaregistry.v1+json", "application/json"):
         return json.loads(decoded_body)
     else:
-        logger.warning(f"Unrecognized content type: {type_!r}. The message "
-                       "is being decoded into a string. kafkit might need "
-                       "to be updated if the registry server is serving new "
-                       "content types.")
+        logger.warning(
+            f"Unrecognized content type: {type_!r}. The message "
+            "is being decoded into a string. kafkit might need "
+            "to be updated if the registry server is serving new "
+            "content types."
+        )
         return decoded_body
 
 
 class RegistryApi(metaclass=abc.ABCMeta):
-    """A baseclass for Confluent Schema Registry clients.
-    """
+    """A baseclass for Confluent Schema Registry clients."""
 
     def __init__(self, *, url):
         self.url = url
@@ -115,39 +123,37 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
     @property
     def schema_cache(self):
-        """The schema cache (`~kafkit.registry.sansio.SchemaCache`).
-        """
+        """The schema cache (`~kafkit.registry.sansio.SchemaCache`)."""
         return self._schema_cache
 
     @property
     def subject_cache(self):
-        """The subject cache (`~kafkit.registry.sansio.SubjectCache`).
-        """
+        """The subject cache (`~kafkit.registry.sansio.SubjectCache`)."""
         return self._subject_cache
 
     @abc.abstractmethod
     async def _request(self, method, url, headers, body):
-        """Make an HTTP request.
-        """
+        """Make an HTTP request."""
 
     async def _make_request(self, method, url, url_vars, data):
-        """Construct and make an HTTP request.
-        """
+        """Construct and make an HTTP request."""
         expanded_url = format_url(host=self.url, url=url, url_vars=url_vars)
         request_headers = make_headers()
 
         if data == b"":
             body = b""
-            request_headers['content-length'] = '0'
+            request_headers["content-length"] = "0"
         else:
             charset = "utf-8"
             body = json.dumps(data).encode(charset)
-            request_headers['content-type'] \
-                = f"application/json; charset={charset}"
-            request_headers['content-length'] = str(len(body))
+            request_headers[
+                "content-type"
+            ] = f"application/json; charset={charset}"
+            request_headers["content-length"] = str(len(body))
 
-        response = await self._request(method, expanded_url, request_headers,
-                                       body)
+        response = await self._request(
+            method, expanded_url, request_headers, body
+        )
         response_data = decipher_response(*response)
         return response_data
 
@@ -331,11 +337,11 @@ class RegistryApi(metaclass=abc.ABCMeta):
         """
         schema = schema.copy()
         try:
-            del schema['__fastavro_parsed']
+            del schema["__fastavro_parsed"]
         except KeyError:
             pass
         # sort keys for repeatable tests
-        return json.dumps(schema, sort_keys='true')
+        return json.dumps(schema, sort_keys="true")
 
     async def register_schema(self, schema, subject=None):
         """Register a schema or get the ID of an existing schema.
@@ -375,20 +381,23 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         if subject is None:
             try:
-                subject = schema['name']
+                subject = schema["name"]
             except (KeyError, TypeError):
-                raise RuntimeError('Cannot get a subject name from a \'name\' '
-                                   f'key in the schema: {schema!r}')
+                raise RuntimeError(
+                    "Cannot get a subject name from a 'name' "
+                    f"key in the schema: {schema!r}"
+                )
 
         result = await self.post(
-            '/subjects{/subject}/versions',
-            url_vars={'subject': subject},
-            data={'schema': self._prep_schema(schema)})
+            "/subjects{/subject}/versions",
+            url_vars={"subject": subject},
+            data={"schema": self._prep_schema(schema)},
+        )
 
         # add to cache
-        self.schema_cache.insert(schema, result['id'])
+        self.schema_cache.insert(schema, result["id"])
 
-        return result['id']
+        return result["id"]
 
     async def get_schema_by_id(self, schema_id):
         """Get a schema from the registry given its ID.
@@ -424,16 +433,16 @@ class RegistryApi(metaclass=abc.ABCMeta):
             pass
 
         result = await self.get(
-            '/schemas/ids{/schema_id}',
-            url_vars={'schema_id': str(schema_id)})
-        schema = fastavro.parse_schema(json.loads(result['schema']))
+            "/schemas/ids{/schema_id}", url_vars={"schema_id": str(schema_id)}
+        )
+        schema = fastavro.parse_schema(json.loads(result["schema"]))
 
         # Add schema to cache
         self.schema_cache.insert(schema, schema_id)
 
         return schema
 
-    async def get_schema_by_subject(self, subject, version='latest'):
+    async def get_schema_by_subject(self, subject, version="latest"):
         """Get a schema for a subject in the registry.
 
         Wraps ``GET /subjects/(string: subject)/versions/(versionId: version)``
@@ -482,26 +491,28 @@ class RegistryApi(metaclass=abc.ABCMeta):
             pass
 
         result = await self.get(
-            '/subjects{/subject}/versions{/version}',
-            url_vars={'subject': subject, 'version': str(version)})
+            "/subjects{/subject}/versions{/version}",
+            url_vars={"subject": subject, "version": str(version)},
+        )
 
-        schema = fastavro.parse_schema(json.loads(result['schema']))
+        schema = fastavro.parse_schema(json.loads(result["schema"]))
 
         try:
             self.subject_cache.insert(
-                result['subject'],
-                result['version'],
-                schema_id=result['id'],
-                schema=schema)
+                result["subject"],
+                result["version"],
+                schema_id=result["id"],
+                schema=schema,
+            )
         except TypeError:
             # Can't cache versions like "latest"
             pass
 
         return {
-            'id': result['id'],
-            'version': result['version'],
-            'subject': result['subject'],
-            'schema': schema
+            "id": result["id"],
+            "version": result["version"],
+            "subject": result["subject"],
+            "schema": schema,
         }
 
 
@@ -511,11 +522,16 @@ class MockRegistryApi(RegistryApi):
     """
 
     DEFAULT_HEADERS = {
-        'content-type': "application/vnd.schemaregistry.v1+json"
+        "content-type": "application/vnd.schemaregistry.v1+json"
     }
 
-    def __init__(self, url='http://registry:8081',
-                 status_code=200, headers=None, body=b''):
+    def __init__(
+        self,
+        url="http://registry:8081",
+        status_code=200,
+        headers=None,
+        body=b"",
+    ):
         super().__init__(url=url)
         self.response_code = status_code
         self.response_headers = headers if headers else self.DEFAULT_HEADERS
@@ -573,8 +589,9 @@ class SchemaCache:
             except Exception:
                 # If the schema couldn't be parsed, its not going to be a
                 # valid key anyhow.
-                raise KeyError('Key or schema not in the SchemaCache: '
-                               f'{key!r}')
+                raise KeyError(
+                    f"Key or schema not in the SchemaCache: {key!r}"
+                )
             return self._schema_to_id[serialized_schema]
 
     def __contains__(self, key):
@@ -720,10 +737,10 @@ class SubjectCache:
         # Important: this return type maches RegistryApi.get_schema_by_subject
         # If this is changed, make sure get_schema_by_subject is also changed.
         return {
-            'subject': subject,
-            'version': version,
-            'id': schema_id,
-            'schema': schema
+            "subject": subject,
+            "version": version,
+            "id": schema_id,
+            "schema": schema,
         }
 
     def insert(self, subject, version, schema_id=None, schema=None):
@@ -759,7 +776,7 @@ class SubjectCache:
         """
         if not isinstance(version, int):
             raise TypeError(
-                'Cannot cache a non-integer version of a subject '
+                "Cannot cache a non-integer version of a subject "
                 '(such as "latest").'
             )
 
@@ -768,10 +785,10 @@ class SubjectCache:
                 # Need to add this schema to the schema_cache first
                 if schema is None:
                     raise ValueError(
-                        'Trying to cache the schema ID for subject '
-                        f'{subject!r}, version {version}, but its schema ID '
-                        f'({schema_id}) and schema are not in the schema '
-                        'cache. Provide the schema as well as the schema_id.'
+                        "Trying to cache the schema ID for subject "
+                        f"{subject!r}, version {version}, but its schema ID "
+                        f"({schema_id}) and schema are not in the schema "
+                        "cache. Provide the schema as well as the schema_id."
                     )
                 self.schema_cache.insert(schema, schema_id)
             self._subject_to_id[(subject, version)] = schema_id
@@ -781,10 +798,10 @@ class SubjectCache:
                 # Need to add this schema to the schema_cache first
                 if schema_id is None:
                     raise ValueError(
-                        'Trying to cache the schema ID for subject '
-                        f'{subject!r}, version {version}, but it\'s schema ID '
-                        'and schema are not in the schema cache. Provide the '
-                        'schema argument as well as schema_id.'
+                        "Trying to cache the schema ID for subject "
+                        f"{subject!r}, version {version}, but it's schema ID "
+                        "and schema are not in the schema cache. Provide the "
+                        "schema argument as well as schema_id."
                     )
                 self.schema_cache.insert(schema, schema_id)
             schema_id = self.schema_cache[schema]
@@ -792,7 +809,7 @@ class SubjectCache:
 
         else:
             raise ValueError(
-                'Provide either a schema_id or schema argument (or both).'
+                "Provide either a schema_id or schema argument (or both)."
             )
 
     def __contains__(self, key):
