@@ -202,7 +202,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.RegistryRadRequestError
+        kafkit.registry.kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
@@ -239,7 +239,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.RegistryRadRequestError
+        kafkit.registry.kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
@@ -276,7 +276,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.RegistryRadRequestError
+        kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
@@ -313,7 +313,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.RegistryRadRequestError
+        kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
@@ -354,7 +354,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.RegistryRadRequestError
+        kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
