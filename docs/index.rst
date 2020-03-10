@@ -31,6 +31,13 @@ User guide
 
 .. toctree::
 
+   strimzi-ssl-howto
+
+API reference
+=============
+
+.. toctree::
+
    api
 
 Developer guide
