@@ -6,9 +6,13 @@ import lsst_sphinx_bootstrap_theme
 # Common links and substitutions =============================================
 
 rst_epilog = """
-.. _Confluent Schema Registry: https://docs.confluent.io/current/schema-registry/docs/index.html
-.. _aiokafka: https://aiokafka.readthedocs.io/en/stable/
 .. _aiohttp: https://aiohttp.readthedocs.io/en/stable/
+.. _aiokafka: https://aiokafka.readthedocs.io/en/stable/
+.. _Confluent Schema Registry: https://docs.confluent.io/current/schema-registry/docs/index.html
+.. _mypy: http://www.mypy-lang.org
+.. _pre-commit: https://pre-commit.com
+.. _pytest: https://docs.pytest.org/en/latest/
+.. _tox: https://tox.readthedocs.io/en/latest/
 """
 
 # Extensions =================================================================
