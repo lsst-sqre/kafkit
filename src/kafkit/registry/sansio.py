@@ -9,6 +9,7 @@ See licenses/gidgethub.txt for license info.
 from __future__ import annotations
 
 import abc
+import copy
 import json
 import logging
 from typing import Any, Dict, Mapping, Optional, Tuple, Union, overload
@@ -392,7 +393,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         """Prep a schema for submission through an API request by
         removing any fastavro hints and dumping to a string.
         """
-        schema = dict(schema)  # make a copy
+        schema = dict(copy.deepcopy(schema))
         try:
             del schema["__fastavro_parsed"]
         except KeyError:
@@ -605,7 +606,7 @@ class MockRegistryApi(RegistryApi):
         self.url = url
         self.headers = headers
         self.body = body
-        response_headers = dict(self.response_headers)  # make a copy
+        response_headers = copy.deepcopy(self.response_headers)
         return self.response_code, response_headers, self.response_body
 
 
@@ -656,7 +657,7 @@ class SchemaCache:
         else:
             # Key must be a schema
             # Always ensure the schema is parsed
-            schema = dict(key)  # make a copy
+            schema = copy.deepcopy(key)
             try:
                 serialized_schema = SchemaCache._serialize_schema(schema)
             except Exception:
