@@ -4,9 +4,17 @@ This code and architecture is based on https://github.com/brettcannon/gidgethub
 See licenses/gidgethub.txt for info.
 """
 
-__all__ = ('RegistryApi',)
+from __future__ import annotations
 
-from . import sansio
+from typing import TYPE_CHECKING, Mapping, Tuple
+
+from kafkit.registry import sansio
+
+__all__ = ["RegistryApi"]
+
+
+if TYPE_CHECKING:
+    from aiohttp import ClientSession
 
 
 class RegistryApi(sansio.RegistryApi):
@@ -20,11 +28,14 @@ class RegistryApi(sansio.RegistryApi):
         The Confluent Schema Registry URL (e.g. http://registry:8081).
     """
 
-    def __init__(self, *, session, url):
+    def __init__(self, *, session: ClientSession, url: str) -> None:
         self._session = session
         super().__init__(url=url)
 
-    async def _request(self, method, url, headers, body):
+    async def _request(
+        self, method: str, url: str, headers: Mapping[str, str], body: bytes
+    ) -> Tuple[int, Mapping[str, str], bytes]:
         async with self._session.request(
-                method, url, headers=headers, data=body) as response:
+            method, url, headers=headers, data=body
+        ) as response:
             return response.status, response.headers, await response.read()

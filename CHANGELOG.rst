@@ -2,6 +2,24 @@
 Change log
 ##########
 
+0.2.0 (unreleased)
+==================
+
+- Python versions 3.6 and earlier are no longer supported because Kafkit is adopting the ``annotations`` import from ``__future__``.
+  Kafkit is explicitly tested with Python 3.7 and 3.8.
+
+- We've significantly improved Kafkit's packaging and infrastructure:
+
+  - Migrate packaging metadata from ``setup.py`` to ``setup.cfg``.
+  - Support PEP 518 with ``pyproject.toml`` (Kafkit continues to be a setuptools-based project).
+  - Tox now runs tasks like tests, in conjunction with the existing Pytest set up.
+  - Pre-commit hooks lint and format the code base.
+  - Code style is now handled by Black (and in the documentation with blacken-docs).
+  - **Full support for type annotations!** ``tox -e typing`` validates Kafkit's type annotations with Mypy.
+  - We've migrated from Travis CI to GitHub Actions.
+
+- The documentation now includes a development guide.
+
 0.1.1 (2019-02-13)
 ==================
 

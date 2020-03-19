@@ -33,6 +33,14 @@ User guide
 
    api
 
+Developer guide
+===============
+
+.. toctree::
+   :maxdepth: 2
+
+   dev/index
+
 Project information
 ===================
 
