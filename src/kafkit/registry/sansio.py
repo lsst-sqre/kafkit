@@ -179,7 +179,9 @@ class RegistryApi(metaclass=abc.ABCMeta):
         response_data = decipher_response(*response)
         return response_data
 
-    async def get(self, url: str, url_vars: Mapping[str, str] = dict()) -> Any:
+    async def get(
+        self, url: str, url_vars: Optional[Mapping[str, str]] = None
+    ) -> Any:
         """Send an HTTP GET request.
 
         Parameters
@@ -209,11 +211,17 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Raised if the server returns a 5XX status because something is
             wrong with the server itself.
         """
+        if url_vars is None:
+            url_vars = {}
         data = await self._make_request("GET", url, url_vars, b"")
         return data
 
     async def post(
-        self, url: str, url_vars: Mapping[str, str] = dict(), *, data: Any
+        self,
+        url: str,
+        url_vars: Optional[Mapping[str, str]] = None,
+        *,
+        data: Any,
     ) -> Any:
         """Send an HTTP POST request.
 
@@ -246,11 +254,17 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Raised if the server returns a 5XX status because something is
             wrong with the server itself.
         """
+        if url_vars is None:
+            url_vars = {}
         data = await self._make_request("POST", url, url_vars, data)
         return data
 
     async def patch(
-        self, url: str, url_vars: Mapping[Any, Any] = dict(), *, data: Any
+        self,
+        url: str,
+        url_vars: Optional[Mapping[Any, Any]] = None,
+        *,
+        data: Any,
     ) -> Any:
         """Send an HTTP PATCH request.
 
@@ -283,11 +297,16 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Raised if the server returns a 5XX status because something is
             wrong with the server itself.
         """
+        if url_vars is None:
+            url_vars = {}
         data = await self._make_request("PATCH", url, url_vars, data)
         return data
 
     async def put(
-        self, url: str, url_vars: Mapping[str, str] = dict(), data: Any = b""
+        self,
+        url: str,
+        url_vars: Optional[Mapping[str, str]] = None,
+        data: Any = b"",
     ) -> Any:
         """Send an HTTP PUT request.
 
@@ -320,13 +339,15 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Raised if the server returns a 5XX status because something is
             wrong with the server itself.
         """
+        if url_vars is None:
+            url_vars = {}
         data = await self._make_request("PUT", url, url_vars, data)
         return data
 
     async def delete(
         self,
         url: str,
-        url_vars: Mapping[str, str] = dict(),
+        url_vars: Optional[Mapping[str, str]] = None,
         *,
         data: Any = b"",
     ) -> Any:
@@ -361,6 +382,8 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Raised if the server returns a 5XX status because something is
             wrong with the server itself.
         """
+        if url_vars is None:
+            url_vars = {}
         data = await self._make_request("DELETE", url, url_vars, data)
         return data
 
