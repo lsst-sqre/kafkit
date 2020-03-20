@@ -48,7 +48,7 @@ jobs:
         env:
           LTD_USERNAME: travis
           LTD_PASSWORD: ${{ secrets.LTD_PASSWORD }}
-        run: ltd upload --product safir --gh --dir docs/_build/html
+        run: ltd upload --product kafkit --gh --dir docs/_build/html
 
   pypi:
 
