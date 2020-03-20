@@ -106,5 +106,5 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 79
 known_first_party = "kafkit"
-known_third_party = ["fastavro", "pytest", "setuptools", "uritemplate"]
+known_third_party = ["aiohttp", "fastavro", "pytest", "setuptools", "uritemplate"]
 skip = ["docs/conf.py"]
