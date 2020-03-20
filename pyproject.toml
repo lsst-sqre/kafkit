@@ -18,8 +18,17 @@ isolated_build = True
 description = Run pytest against {envname}.
 extras =
     dev
-commands=
+    aiohttp
+whitelist_externals =
+    docker-compose
+setenv =
+    KAFKA_BROKER_URL=localhost:9092
+    SCHEMA_REGISTRY_URL=http://localhost:8081
+commands =
+    docker-compose up -d
+    holdup -t 60 -T 5 -i 1 -n --insecure http://localhost:8081/subjects
     coverage run -m pytest {posargs}
+    docker-compose down
 
 [testenv:coverage-report]
 description = Compile coverage from each test run.
