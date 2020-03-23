@@ -1,10 +1,9 @@
 """Support for connecting to brokers with SSL."""
 
-__all__ = ["create_ssl_context", "concatenate_certificates"]
+__all__ = ["create_ssl_context"]
 
 import ssl
 from pathlib import Path
-from typing import List
 
 
 def create_ssl_context(
@@ -36,27 +35,3 @@ def create_ssl_context(
         certfile=str(client_cert_path), keyfile=str(client_key_path)
     )
     return ssl_context
-
-
-def concatenate_certificates(
-    *, output_path: Path, cert_path: Path, ca_path: Path
-) -> None:
-    """Concatenate a certificate with a CA and save to an output path.
-
-    Parameters
-    ----------
-    cert_path : `pathlib.Path`
-        The certificate path.
-    ca_path : `pathlib.Path`
-        The CA path.
-    output_path : `pathlib.Path`
-        Path where the concatenated certificate is written.
-    """
-    certificates: List[str] = []
-    for p in [cert_path, ca_path]:
-        cert = p.read_text()
-        if not cert.endswith("\n"):
-            cert += "\n"
-        certificates.append(cert)
-    certificate = "".join(certificates)
-    output_path.write_text(certificate)

@@ -45,7 +45,7 @@ In your client's Kubernetes ``Deployment`` resource, you can mount these Secrets
                secretName: kafkauser-myapp
            - name: "broker-tls"
              secret:
-               # matches name of Strimzi cluster cluster CA cert secret
+               # matches name of Strimzi cluster CA cert secret
                secretName: "events-cluster-ca-cert"
 
 In your Python application code, you can create paths to the individual certificates and key files:
@@ -56,30 +56,8 @@ In your Python application code, you can create paths to the individual certific
 
    broker_ca_path = Path("/var/strimzi-broker/ca.crt")
 
-   client_ca_path = Path("/var/strimzi-client/ca.crt")
    client_cert_path = Path("/var/strimzi-client/user.crt")
    client_key_path = Path("/var/strimzi-client/user.key")
-
-Concatenate the client's certificate and CA
-===========================================
-
-Before using the certificates, you need to concatenate the client's certificate with the CA for Kafka clients in your cluster.
-
-You can do this with the `kafkit.ssl.concatenate_certificates` function:
-
-.. code-block:: python
-
-   from kafkit.ssl import concatenate_certificates
-
-   client_concatenated_path = Path("./client.crt")
-
-   concatenate_certificates(
-       output_path=client_concatenated_path,
-       cert_path=client_cert_path,
-       ca_path=client_ca_path,
-   )
-
-Now at the ``client_concatenated_path`` path on your pod's filesystem there is the client certificate with the client CA appended to it.
 
 Create the SSLContext
 =====================
@@ -93,7 +71,7 @@ The `kafkit.ssl.create_ssl_context` function lets you create an `~ssl.SSLContext
 
    ssl_context = create_ssl_context(
        cluster_ca_path=broker_ca_path,
-       client_cert_path=client_concatenated_path,
+       client_cert_path=client_cert_path,
        client_key_path=client_key_path,
    )
 
