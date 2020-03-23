@@ -8,6 +8,9 @@ Change log
 - Python versions 3.6 and earlier are no longer supported because Kafkit is adopting the ``annotations`` import from ``__future__``.
   Kafkit is explicitly tested with Python 3.7 and 3.8.
 
+- We've added a ``kafkit.ssl`` module to help connect to Kafka brokers over TLS.
+  The associated documentation includes a tutorial for working with the SSL certificates generated in a Kafka cluster managed by `Strimzi <https://strimzi.io>`__.
+
 - We've significantly improved Kafkit's packaging and infrastructure:
 
   - Migrate packaging metadata from ``setup.py`` to ``setup.cfg``.
