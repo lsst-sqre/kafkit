@@ -7,6 +7,12 @@ repos:
   - id: check-json
   - id: trailing-whitespace
 
+- repo: https://github.com/Lucas-C/pre-commit-hooks-markup
+  rev: v1.0.0
+  hooks:
+  - id: rst-linter
+    files: (README\.rst)|(CHANGELOG\.rst)
+
 - repo: https://github.com/asottile/seed-isort-config
   rev: v1.9.4
   hooks:
