@@ -10,15 +10,14 @@ from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 import fastavro
 
+if TYPE_CHECKING:
+    from kafit.registry.sansio import RegistryApi
+
 __all__ = [
     "Serializer",
     "PolySerializer",
     "Deserializer",
 ]
-
-
-if TYPE_CHECKING:
-    from kafit.registry.sansio import RegistryApi
 
 
 class Serializer:

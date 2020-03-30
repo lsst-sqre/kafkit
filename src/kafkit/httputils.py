@@ -4,13 +4,13 @@ This code is based on on the sans-io code of Gidgethub
 (https://github.com/brettcannon/gidgethub) and generalized for Kafkit.
 """
 
-__all__ = ["format_url", "parse_content_type"]
-
 import cgi
 import urllib.parse
 from typing import Mapping, Optional, Tuple
 
 import uritemplate
+
+__all__ = ["format_url", "parse_content_type"]
 
 
 def format_url(*, host: str, url: str, url_vars: Mapping[str, str]) -> str:
