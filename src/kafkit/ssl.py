@@ -1,9 +1,9 @@
 """Support for connecting to brokers with SSL."""
 
-__all__ = ["create_ssl_context"]
-
 import ssl
 from pathlib import Path
+
+__all__ = ["create_ssl_context"]
 
 
 def create_ssl_context(

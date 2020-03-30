@@ -11,6 +11,12 @@ Change log
 - We've added a ``kafkit.ssl`` module to help connect to Kafka brokers over TLS.
   The associated documentation includes a tutorial for working with the SSL certificates generated in a Kafka cluster managed by `Strimzi <https://strimzi.io>`__.
 
+- The brand-new ``kafkit.registry.manager.RecordNameSchemaManager`` provides a streamlined workflow for serializing Avro messages using Avro schemas that are maintained in your app's codebase.
+  The manager handles schema registration for you.
+  To serialize a message, you simply need to provide the data and the name of the schema.
+
+- A new ``kafkit.registry.sansio.CompatibilityType`` Enum helps you write use valid Schema Registry compatibility types.
+
 - We've significantly improved Kafkit's packaging and infrastructure:
 
   - Migrate packaging metadata from ``setup.py`` to ``setup.cfg``.

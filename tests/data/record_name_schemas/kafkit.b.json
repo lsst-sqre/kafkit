@@ -1,0 +1,8 @@
+{
+  "type": "record",
+  "name": "kafkit.b",
+  "fields": [
+    {"name": "fieldA", "type": "int"},
+    {"name": "fieldB", "type": "string"}
+  ]
+}

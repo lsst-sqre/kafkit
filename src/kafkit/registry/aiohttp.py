@@ -10,11 +10,10 @@ from typing import TYPE_CHECKING, Mapping, Tuple
 
 from kafkit.registry import sansio
 
-__all__ = ["RegistryApi"]
-
-
 if TYPE_CHECKING:
     from aiohttp import ClientSession
+
+__all__ = ["RegistryApi"]
 
 
 class RegistryApi(sansio.RegistryApi):
