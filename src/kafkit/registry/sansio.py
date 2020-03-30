@@ -12,6 +12,7 @@ import abc
 import copy
 import json
 import logging
+from enum import Enum
 from typing import Any, Dict, Mapping, Optional, Tuple, Union, overload
 
 import fastavro
@@ -32,6 +33,7 @@ __all__ = [
     "MockRegistryApi",
     "SchemaCache",
     "SubjectCache",
+    "CompatibilityType",
 ]
 
 
@@ -898,3 +900,21 @@ class SubjectCache:
 
     def __contains__(self, key: Tuple[str, int]) -> bool:
         return key in self._subject_to_id
+
+
+class CompatibilityType(str, Enum):
+    """Compatibility settings available for the Confluent Schema Registry, as
+    an Enum.
+
+    To learn more about compatibility settings, see Confluent's documentation
+    on `Compatibility Types
+    <https://docs.confluent.io/current/schema-registry/avro.html#compatibility-types>`__.
+    """
+
+    BACKWARD = "BACKWARD"
+    BACKWARD_TRANSITIVE = "BACKWARD_TRANSITIVE"
+    FORWARD = "FORWARD"
+    FORWARD_TRANSITIVE = "FORWARD_TRANSITIVE"
+    FULL = "FULL"
+    FULL_TRANSITIVE = "FULL_TRANSITIVE"
+    NONE = "NONE"

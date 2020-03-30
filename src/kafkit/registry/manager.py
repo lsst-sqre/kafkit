@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional
 
 from kafkit.registry.errors import RegistryBadRequestError
+from kafkit.registry.sansio import CompatibilityType
 from kafkit.registry.serializer import PolySerializer
 
 if TYPE_CHECKING:
@@ -159,21 +160,14 @@ class RecordNameSchemaManager:
             documentation
             <https://docs.confluent.io/current/schema-registry/avro.html>`__.
         """
-        allowed = {
-            "BACKWARD",
-            "BACKWARD_TRANSITIVE",
-            "FORWARD",
-            "FORWARD_TRANSITIVE",
-            "FULL",
-            "FULL_TRANSITIVE",
-            "NONE",
-            None,
-        }
-        if compatibility not in allowed:
-            raise ValueError(
-                f"Compatibility setting {compatibility!r} is not in the "
-                f"allowed set: {allowed}"
-            )
+        if isinstance(compatibility, str):
+            try:
+                CompatibilityType[compatibility]
+            except KeyError:
+                raise ValueError(
+                    f"Compatibility setting {compatibility!r} is not in the "
+                    f"allowed set: {[v.value for v in CompatibilityType]}"
+                )
         for subject_name, schema in self.schemas.items():
             await self._register_schema(
                 subject_name=subject_name,
