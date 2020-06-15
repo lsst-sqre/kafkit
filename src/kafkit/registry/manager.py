@@ -93,7 +93,7 @@ class RecordNameSchemaManager:
             schema = json.loads(schema_path.read_text())
 
             if self._suffix:
-                schema["name"] = f'schema["name"]{self._suffix}'
+                schema["name"] = f'{schema["name"]}{self._suffix}'
 
             fqn = self._get_fqn(schema)
             self.schemas[fqn] = schema
