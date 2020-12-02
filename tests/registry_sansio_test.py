@@ -195,25 +195,35 @@ async def test_register_schema() -> None:
     }
 
     # Body that we expect the registry API to return given the request.
-    expected_body = json.dumps({"id": 1}).encode("utf-8")
+    expected_body = [
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "test-schemas.schema1",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(input_schema),
+            }
+        ).encode("utf-8"),
+    ]
 
     client = MockRegistryApi(url="http://registry:8081", body=expected_body)
     schema_id = await client.register_schema(input_schema)
     assert schema_id == 1
 
     # Test details of the request itself
-    assert client.method == "POST"
+    assert client.requests[0]["method"] == "POST"
     assert (
-        client.url
+        client.requests[0]["url"]
         == "http://registry:8081/subjects/test-schemas.schema1/versions"
     )
-    sent_json = json.loads(client.body)
+    sent_json = json.loads(client.requests[0]["body"])
     assert "schema" in sent_json
     sent_schema = json.loads(sent_json["schema"])
     assert "__fastavro_parsed" not in sent_schema
     assert sent_schema["name"] == "test-schemas.schema1"
 
-    # Check that the schema is in the cache and is parsed
+    # Check that the schema is in the schema cache and is parsed
     # Value of type "Union[int, Dict[str, Any]]" is not indexable
     cached_schema = client.schema_cache[1]
     assert cached_schema["name"] == "test-schemas.schema1"
