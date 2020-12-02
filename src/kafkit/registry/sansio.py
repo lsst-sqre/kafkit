@@ -601,15 +601,31 @@ class MockRegistryApi(RegistryApi):
         self.response_headers = headers if headers else self.DEFAULT_HEADERS
         self.response_body = body
 
+        self.requests = []  # stores info about all requests made
+        self.counter = 0
+
     async def _request(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes
     ) -> Any:
+        # reset if we've looped through all available responses
+        if isinstance(self.response_body, list) and self.counter == len(
+            self.response_body
+        ):
+            self.counter = 0
+        self.requests.append(
+            {"method": method, "url": url, "headers": headers, "body": body}
+        )
         self.method = method
         self.url = url
         self.headers = headers
         self.body = body
         response_headers = copy.deepcopy(self.response_headers)
-        return self.response_code, response_headers, self.response_body
+        if isinstance(self.response_body, list):
+            response_body = self.response_body[self.counter]
+        else:
+            response_body = self.response_body
+        self.counter += 1
+        return self.response_code, response_headers, response_body
 
 
 class SchemaCache:
