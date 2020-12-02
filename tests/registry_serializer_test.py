@@ -38,7 +38,6 @@ def test_unpacking_short_message() -> None:
 @pytest.mark.asyncio
 async def test_serializer() -> None:
     """Test the Serializer class."""
-    client = MockRegistryApi(body=json.dumps({"id": 1}).encode("utf-8"))
     schema1 = {
         "type": "record",
         "name": "schema1",
@@ -48,6 +47,19 @@ async def test_serializer() -> None:
             {"name": "b", "type": "string"},
         ],
     }
+    expected_body = [
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "test-schemas.schema1",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(schema1),
+            }
+        ).encode("utf-8"),
+    ]
+    client = MockRegistryApi(body=expected_body)
+
     serializer = await Serializer.register(registry=client, schema=schema1)
     assert serializer.id == 1
 
@@ -186,7 +198,17 @@ async def test_polyserializer_given_schema() -> None:
         ],
     }
 
-    body = json.dumps({"id": 1}).encode("utf-8")
+    body = [
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "test-schemas.schema1",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(schema),
+            }
+        ).encode("utf-8"),
+    ]
     client = MockRegistryApi(body=body)
 
     serializer = PolySerializer(registry=client)
