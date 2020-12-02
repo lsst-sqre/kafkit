@@ -437,7 +437,11 @@ class RegistryApi(metaclass=abc.ABCMeta):
         # look in cache first
         try:
             schema_id = self.schema_cache[schema]
-            return schema_id
+            # If subject, skip short circuit to give us a chance to register
+            # schema with new subjects in Schema registry and in subject cache
+            if subject is None:
+                return schema_id
+
         except KeyError:
             pass
 
@@ -458,6 +462,11 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         # add to cache
         self.schema_cache.insert(schema, result["id"])
+
+        # Fetch subject/schema_id mapping and add it to the cache
+        # Since we don't get subject version in previous result, we always
+        # do a second request to Schema Registry by fetching "latest"
+        await self.get_schema_by_subject(subject, "latest")
 
         return result["id"]
 
