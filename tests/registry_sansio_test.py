@@ -225,6 +225,48 @@ async def test_register_schema() -> None:
 
 
 @pytest.mark.asyncio
+async def test_register_schema_with_different_subjects():
+    input_schema = {
+        "type": "record",
+        "name": "schema1",
+        "namespace": "test-schemas",
+        "fields": [{"name": "a", "type": "int"}],
+    }
+    # Responses returned from the MockRegistryApi, in turn
+    mock_responses = [
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "subject1",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(input_schema),
+            }
+        ).encode("utf-8"),
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "subject2",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(input_schema),
+            }
+        ).encode("utf-8"),
+    ]
+
+    client = MockRegistryApi(url="http://registry:8081", body=mock_responses)
+    schema_id = await client.register_schema(input_schema, "subject1")
+    subject_cache_entry = client.subject_cache.get("subject1", 1)
+    assert schema_id == 1
+    assert subject_cache_entry["id"] == schema_id
+
+    await client.register_schema(input_schema, "subject2")
+    subject_cache_entry2 = client.subject_cache.get("subject2", 1)
+    assert schema_id == 1
+    assert subject_cache_entry2["id"] == schema_id
+
+
+@pytest.mark.asyncio
 async def test_get_schema_by_id() -> None:
     """Test the RegistryApi.get_schema_by_id method."""
     # Body that we expect the registry API to return given the request.
