@@ -679,8 +679,7 @@ class SchemaCache:
 
     @staticmethod
     def _serialize_schema(schema: Mapping[str, Any]) -> str:
-        """Predictably serialize the schema so that it's hashable.
-        """
+        """Predictably serialize the schema so that it's hashable."""
         schema = fastavro.parse_schema(schema)
         return json.dumps(schema, sort_keys=True)
 

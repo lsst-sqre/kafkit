@@ -194,8 +194,7 @@ class PolySerializer:
 def _make_message(
     *, schema_id: int, schema: Dict[str, Any], data: Any
 ) -> bytes:
-    """Make a message in the Confluent Wire Format.
-    """
+    """Make a message in the Confluent Wire Format."""
     message_fh = BytesIO()
     # Write the Confluent Wire Format prefix.
     message_fh.write(pack_wire_format_prefix(schema_id))

@@ -175,8 +175,7 @@ async def test_registryapi_put() -> None:
 
 @pytest.mark.asyncio
 async def test_registryapi_delete() -> None:
-    """Test RegistryApi.put().
-    """
+    """Test RegistryApi.put()."""
     client = MockRegistryApi(url="http://registry:8081")
     await client.delete("/a{/b}", url_vars={"b": "hello"})
 
