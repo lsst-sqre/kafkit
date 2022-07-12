@@ -8,57 +8,6 @@ build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
 
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py37,coverage-report,typing,lint
-isolated_build = True
-
-[testenv]
-description = Run pytest against {envname}.
-extras =
-    dev
-    aiohttp
-whitelist_externals =
-    docker-compose
-setenv =
-    KAFKA_BROKER_URL=localhost:9092
-    SCHEMA_REGISTRY_URL=http://localhost:8081
-commands =
-    docker-compose up -d
-    holdup -t 60 -T 5 -i 1 -n --insecure http://localhost:8081/subjects
-    coverage run -m pytest {posargs}
-    docker-compose down
-
-[testenv:coverage-report]
-description = Compile coverage from each test run.
-skip_install = true
-deps = coverage[toml]>=5.0.2
-depends =
-    py36
-    py37
-    py38
-commands =
-    coverage combine
-    coverage report
-
-[testenv:typing]
-description = Run mypy.
-commands =
-    mypy src/kafkit tests setup.py
-
-[testenv:lint]
-description = Lint codebase by running pre-commit (Black, isort, Flake8).
-skip_install = true
-deps = pre-commit
-commands = pre-commit run --all-files
-
-[testenv:docs]
-description = Build documentation (HTML) with Sphinx.
-commands =
-    sphinx-build -n -T -b html -d {envtmpdir}/doctrees docs docs/_build/html
-"""
-
 [tool.coverage.run]
 parallel = true
 branch = true
@@ -83,7 +32,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 79
-target-version = ['py37']
+target-version = ['py38']
 exclude = '''
 /(
     \.eggs
@@ -106,5 +55,25 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 79
 known_first_party = "kafkit"
-known_third_party = ["aiohttp", "fastavro", "pytest", "setuptools", "uritemplate"]
 skip = ["docs/conf.py"]
+
+[tool.pytest]
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+python_files = [
+    "tests/*.py",
+    "tests/*/*.py"
+]
+markers = [
+    "docker", # marks tests as requiring docker-compose (deselect with '-m "not docker"')"
+]
+
+[tool.mypy]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+ignore_missing_imports = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
