@@ -35,7 +35,7 @@ def format_url(*, host: str, url: str, url_vars: Mapping[str, str]) -> str:
         Fully-formatted URL.
     """
     url = urllib.parse.urljoin(host, url)
-    return uritemplate.expand(url, **url_vars)
+    return uritemplate.expand(url, dict(url_vars))
 
 
 def parse_content_type(
