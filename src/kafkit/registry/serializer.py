@@ -229,7 +229,8 @@ class Deserializer:
        message's schema in the schema registry.
     2. Obtains the schema from the `~kafkit.registry.sansio.RegistryApi`.
        Schemas are cached, so this is a fast operation.
-    3. Decodes the message using `fastavro.schemaless_reader`.
+    3. Decodes the message using
+       `fastavro.schemaless_reader <fastavro._read_py.schemaless_reader>`.
 
     **Why not implement a __call__ method?**
 

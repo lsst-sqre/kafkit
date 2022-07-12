@@ -22,7 +22,6 @@ rst_epilog = """
 
 extensions = [
     "sphinx.ext.autodoc",
-    # "sphinx.ext.autodoc.typehints",
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -43,7 +42,7 @@ master_doc = "index"
 # General information about the project.
 project = "Kafkit"
 copyright = (
-    "2019-2020 "
+    "2019-2022 "
     "Association of Universities for Research in Astronomy, Inc. (AURA)"
 )
 author = "LSST Data Management"
@@ -61,6 +60,14 @@ pygments_style = "sphinx"
 # The reST default role cross-links Python (used for this markup: `text`)
 default_role = "py:obj"
 
+nitpick_ignore = [
+    # Ignore missing cross-references for modules that don't provide
+    # intersphinx.  The documentation itself should use double-quotes instead
+    # of single-quotes to not generate a reference, but automatic references
+    # are generated from the type signatures and can't be avoided.
+    ("py:obj", "aiokafka.AIOKafkaProducer.send_and_wait"),
+]
+
 # Intersphinx ================================================================
 
 intersphinx_mapping = {
@@ -77,7 +84,18 @@ intersphinx_cache_limit = 5  # days
 
 linkcheck_retries = 2
 
-# linkcheck_ignore = [r'^https://jira.lsstcorp.org/browse/']
+linkcheck_ignore = [
+    r"^https://jira.lsstcorp.org/browse/",
+    r"^http://registry:8081",
+]
+
+linkcheck_anchors_ignore = [
+    r"^!",
+    r"compatibility-types",
+    r"wire-format",
+    r"subject-name-strategy",
+    r"errors",
+]
 
 linkcheck_timeout = 15
 
@@ -91,18 +109,7 @@ templates_path = [
 html_theme = "lsst_sphinx_bootstrap_theme"
 html_theme_path = [lsst_sphinx_bootstrap_theme.get_html_theme_path()]
 
-html_context = {
-    # Enable "Edit in GitHub" link
-    "display_github": True,
-    # https://{{ github_host|default("github.com") }}/{{ github_user }}/
-    #     {{ github_repo }}/blob/
-    #     {{ github_version }}{{ conf_py_path }}{{ pagename }}{{ suffix }}
-    "github_user": "lsst-sqre",
-    "github_repo": "kafkit",
-    "conf_py_path": "docs/",
-    # GITHUB_REF is available in GitHub Actions, but master is a safe default
-    "github_version": os.getenv("GITHUB_REF", default="master") + "/",
-}
+html_context = {}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -144,9 +151,17 @@ napoleon_use_admonition_for_examples = False
 napoleon_use_admonition_for_notes = False
 napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
-napoleon_use_keyword = True  # TODO
+napoleon_use_keyword = True
 napoleon_use_param = True
 napoleon_use_rtype = True
+
+napoleon_type_aliases = {
+    # resolves confusion between sans-io version of impl specific version
+    "RegistryApi": "kafkit.registry.sansio.RegistryApi",
+    # Napoleon doesn't resolve whats under TYPE_CHECKING
+    "ClientSession": "aiohttp.ClientSession",
+    "optional": "typing.Optional",
+}
 
 autosummary_generate = True
 
