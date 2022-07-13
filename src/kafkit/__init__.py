@@ -3,14 +3,8 @@
 
 __all__ = ["__version__", "version_info"]
 
-import sys
+from importlib.metadata import PackageNotFoundError, version
 from typing import List
-
-if sys.version_info < (3, 8):
-    from importlib_metadata import PackageNotFoundError, version
-else:
-    from importlib.metadata import PackageNotFoundError, version
-
 
 __version__: str
 """The version string of Kafkit (PEP 440 / SemVer compatible)."""
