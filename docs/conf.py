@@ -7,6 +7,7 @@ import kafkit
 # Common links and substitutions =============================================
 
 rst_epilog = """
+
 .. _aiohttp: https://aiohttp.readthedocs.io/en/stable/
 .. _aiokafka: https://aiokafka.readthedocs.io/en/stable/
 .. _Confluent Schema Registry: https://docs.confluent.io/current/schema-registry/docs/index.html
@@ -22,6 +23,7 @@ rst_epilog = """
 # Extensions =================================================================
 
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
@@ -35,10 +37,14 @@ extensions = [
 
 # General configuration ======================================================
 
-source_suffix = ".rst"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
+    ".md": "markdown",
+}
 
-# The master toctree document.
-master_doc = "index"
+# The root toctree document.
+root_doc = "index"
 
 # General information about the project.
 project = "Kafkit"
@@ -198,3 +204,22 @@ graphviz_dot_args = [
 # TODO extension =============================================================
 
 todo_include_todos = False
+
+# My-ST (Markdown) ===========================================================
+# https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
+
+myst_enable_extensions = [
+    "amsmath",
+    "dollarmath",
+    "colon_fence",
+    "deflist",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
