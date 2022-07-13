@@ -49,10 +49,7 @@ exclude = '''
 # Multi-line strings are implicitly treated by black as regular expressions
 
 [tool.isort]
-include_trailing_comma = true
-multi_line_output = 3
-force_grid_wrap = 0
-use_parentheses = true
+profile = "black"
 line_length = 79
 known_first_party = "kafkit"
 skip = ["docs/conf.py"]
