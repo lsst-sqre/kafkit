@@ -31,6 +31,7 @@ def test_wire_format() -> None:
 
 
 def test_unpacking_short_message() -> None:
+    """Test unpack_wire_format_data with an empty message."""
     with pytest.raises(RuntimeError):
         unpack_wire_format_data(b"")
 

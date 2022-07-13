@@ -1,7 +1,8 @@
 import os
 
-import kafkit
 import lsst_sphinx_bootstrap_theme
+
+import kafkit
 
 # Common links and substitutions =============================================
 

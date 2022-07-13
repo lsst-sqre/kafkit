@@ -475,7 +475,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
             The Avro schema. The schema is pre-parsed by
             `fastavro.parse_schema <fastavro._schema_py.parse_schema>`.
 
-        See also
+        See Also
         --------
         get_schema_by_subject
 
@@ -533,7 +533,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
             ``"id"``
                 The ID of this schema (compatible with `get_schema_by_id`).
 
-        See also
+        See Also
         --------
         get_schema_by_id
 
@@ -727,7 +727,7 @@ class SubjectCache:
         ValueError
             Raised if the schema does not exist in the cache.
 
-        See also
+        See Also
         --------
         get_schema
         get
@@ -758,7 +758,7 @@ class SubjectCache:
         ValueError
             Raised if the schema does not exist in the cache.
 
-        See also
+        See Also
         --------
         get_id
         get
@@ -801,7 +801,7 @@ class SubjectCache:
         ValueError
             Raised if the schema does not exist in the cache.
 
-        See also
+        See Also
         --------
         get_id
         get_schema

@@ -19,12 +19,14 @@ from kafkit.registry.sansio import (
 
 
 def test_make_headers() -> None:
+    """Test make_headers."""
     headers = make_headers()
 
     assert headers["accept"] == "application/vnd.schemaregistry.v1+json"
 
 
 def test_decipher_response_200() -> None:
+    """Test deciper_response with a 200 status code."""
     status = 200
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     data = [1, 2, 3]
@@ -34,6 +36,7 @@ def test_decipher_response_200() -> None:
 
 
 def test_decipher_response_200_empty() -> None:
+    """Test deciper_response with a 200 status code and an empty body."""
     status = 200
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -42,6 +45,7 @@ def test_decipher_response_200_empty() -> None:
 
 
 def test_decipher_response_500_no_message() -> None:
+    """Test deciper_response with a 500 status code and an empty body."""
     status = 500
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -50,6 +54,7 @@ def test_decipher_response_500_no_message() -> None:
 
 
 def test_decipher_response_500_with_message() -> None:
+    """Test deciper_response with a 500 status code and an error message."""
     status = 500
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = json.dumps({"error": 12345, "message": "I've got reasons"}).encode(
@@ -60,6 +65,7 @@ def test_decipher_response_500_with_message() -> None:
 
 
 def test_decipher_response_401_no_message() -> None:
+    """Test deciper_response with a 401 status code and an empty body."""
     status = 401
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -68,6 +74,7 @@ def test_decipher_response_401_no_message() -> None:
 
 
 def test_decipher_response_401_with_message() -> None:
+    """Test deciper_response with a 401 status code and an error message."""
     status = 401
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = json.dumps({"error": 12345, "message": "I've got reasons"}).encode(
@@ -78,6 +85,7 @@ def test_decipher_response_401_with_message() -> None:
 
 
 def test_decipher_response_301_no_message() -> None:
+    """Test deciper_response with a 301 status code and an empty body."""
     status = 301
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = b""
@@ -86,6 +94,7 @@ def test_decipher_response_301_no_message() -> None:
 
 
 def test_decipher_response_301_with_message() -> None:
+    """Test deciper_response with a 301 status code and a message."""
     status = 301
     headers = {"content-type": "application/vnd.schemaregistry.v1+json"}
     body = json.dumps({"error": 12345, "message": "I've got reasons"}).encode(
@@ -299,6 +308,7 @@ async def test_get_schema_by_subject() -> None:
 
 
 def test_schema_cache() -> None:
+    """Test the SchemaCache."""
     cache = SchemaCache()
 
     schema1 = {
@@ -338,6 +348,7 @@ def test_schema_cache() -> None:
 
 
 def test_subject_cache() -> None:
+    """Test the SubjectCache."""
     cache = SubjectCache(SchemaCache())
 
     schema1 = {

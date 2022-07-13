@@ -12,19 +12,19 @@ from kafkit.ssl import create_ssl_context
 
 @pytest.fixture(scope="session")
 def cluster_ca_path() -> Path:
-    """A cluster CA certificate, as created by Strimzi."""
+    """Provide a cluster CA certificate, as created by Strimzi."""
     return Path(__file__).parent / "data" / "ssl" / "cluster.ca.crt"
 
 
 @pytest.fixture(scope="session")
 def client_cert_path() -> Path:
-    """A client certificate, as created by Stimzi."""
+    """Provide a client certificate, as created by Stimzi."""
     return Path(__file__).parent / "data" / "ssl" / "client.crt"
 
 
 @pytest.fixture(scope="session")
 def client_key_path() -> Path:
-    """A demo client key certificate, as created by Strimzi."""
+    """Provide a demo client key certificate, as created by Strimzi."""
     return Path(__file__).parent / "data" / "ssl" / "client.key"
 
 
