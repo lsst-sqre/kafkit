@@ -30,6 +30,12 @@ repos:
         additional_dependencies: [black==22.6.0]
         args: [-l, '79', -t, py38]
 
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.1.1
+    hooks:
+    - id: pydocstyle
+      additional_dependencies: [toml]
+
   - repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
