@@ -77,8 +77,8 @@ jobs:
         with:
           project: "kafkit"
           dir: "docs/_build/html"
-          username: ${{ secrets.ltd_username }}
-          password: ${{ secrets.ltd_password }}
+          username: ${{ secrets.LTD_USERNAME }}
+          password: ${{ secrets.LTD_PASSWORD }}
         if: >
           github.event_name != 'pull_request'
           || startsWith(github.head_ref, 'tickets/')
