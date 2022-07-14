@@ -41,3 +41,18 @@ jobs:
           python-version: "3.10"
           tox-envs: "docs,docs-linkcheck"
           use-cache: false
+
+  pypi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # full history for setuptools_scm
+
+      - name: Build and publish
+        uses: lsst-sqre/build-and-publish-to-pypi@v1
+        with:
+          pypi-token: ""
+          python-version: "3.10"
+          upload: false
