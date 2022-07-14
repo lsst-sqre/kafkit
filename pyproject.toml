@@ -1,10 +1,72 @@
+[project]
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
+name = "kafkit"
+readme = "README.md"
+description = "Kafkit helps you write Kafka producers and consumers in Python with asyncio."
+license = {text = "MIT"}
+authors = [
+    {name = "Association of Universities for Research in Astronomy, Inc. (AURA)", email = "sqre-admin@lists.lsst.org"},
+]
+keywords = [
+    "rubin",
+    "lsst",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "uritemplate",
+    "fastavro",
+]
+# dynamic = ["version", "readme"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+aiohttp = ["aiohttp"]
+dev = [
+    # Testing
+    "coverage[toml]",
+    "pytest",
+    "pytest-asyncio",
+    "pre-commit",
+    "mypy",
+    # holdup<3 # bug in holdup 3?
+    # Documentation
+    "sphinx",
+    "documenteer",
+    "lsst-sphinx-bootstrap-theme",
+    "sphinx-prompt",
+    "sphinx-automodapi",
+    "myst-parser",
+    "markdown-it-py[linkify]",
+]
+
+[project.urls]
+Homepage = "https://kafkit.lsst.io"
+Source = "https://github.com/lsst-sqre/kafkit"
+
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=61",
     "wheel",
-    "setuptools_scm[toml]>=3.4"
+    "setuptools_scm[toml]>=6.2"
 ]
 build-backend = 'setuptools.build_meta'
+
+[tool.setuptools.packages.find]
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+where = ["src"]
+include = ["kafkit*"]
 
 [tool.setuptools_scm]
 
