@@ -30,7 +30,6 @@ dependencies = [
     "uritemplate",
     "fastavro",
 ]
-# dynamic = ["version", "readme"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -42,7 +41,6 @@ dev = [
     "pytest-asyncio",
     "pre-commit",
     "mypy",
-    # holdup<3 # bug in holdup 3?
     # Documentation
     "sphinx",
     "documenteer",
