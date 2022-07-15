@@ -105,7 +105,8 @@ Then create the schema manager:
 .. code-block:: python
 
    schema_manager = RecordNameSchemaManager(
-       root=schema_root, registry=registry_api,
+       root=schema_root,
+       registry=registry_api,
    )
 
 Step 3. Register schemas

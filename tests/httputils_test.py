@@ -39,4 +39,5 @@ from kafkit.httputils import format_url
 def test_format_url(
     host: str, url: str, url_vars: Dict[str, str], expected: str
 ) -> None:
+    """Test `kafkit.httputils.format_url`."""
     assert expected == format_url(host=host, url=url, url_vars=url_vars)

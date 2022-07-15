@@ -194,8 +194,7 @@ class PolySerializer:
 def _make_message(
     *, schema_id: int, schema: Dict[str, Any], data: Any
 ) -> bytes:
-    """Make a message in the Confluent Wire Format.
-    """
+    """Make a message in the Confluent Wire Format."""
     message_fh = BytesIO()
     # Write the Confluent Wire Format prefix.
     message_fh.write(pack_wire_format_prefix(schema_id))
@@ -230,7 +229,8 @@ class Deserializer:
        message's schema in the schema registry.
     2. Obtains the schema from the `~kafkit.registry.sansio.RegistryApi`.
        Schemas are cached, so this is a fast operation.
-    3. Decodes the message using `fastavro.schemaless_reader`.
+    3. Decodes the message using
+       `fastavro.schemaless_reader <fastavro._read_py.schemaless_reader>`.
 
     **Why not implement a __call__ method?**
 

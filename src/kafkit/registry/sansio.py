@@ -94,7 +94,7 @@ def decode_body(content_type: Optional[str], body: bytes) -> Any:
 
     Returns
     -------
-    decoded
+    decoded :  dict
         The decoded message.
 
         - If the content type is recognized as JSON, the result will be an
@@ -155,7 +155,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
             Headers to include in the request, a mapping of string key to
             string value.
         body : `bytes`
-            Description
+            The request body.
         """
 
     async def _make_request(
@@ -199,7 +199,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        data
+        data : bytes
             The response body. If the response is JSON, the data is parsed
             into a Python object.
 
@@ -207,7 +207,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.kafkit.registry.RegistryBadRequestError
+        kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
@@ -242,7 +242,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        data
+        data : bytes
             The response body. If the response is JSON, the data is parsed
             into a Python object.
 
@@ -250,7 +250,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         ------
         kafkit.registry.RegistryRedirectionError
             Raised if the server returns a 3XX status.
-        kafkit.registry.kafkit.registry.RegistryBadRequestError
+        kafkit.registry.RegistryBadRequestError
             Raised if the server returns a 4XX status because the request
             is incorrect, not authenticated, or not authorized.
         kafkit.registry.RegistryBrokenError
@@ -285,7 +285,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        data
+        data : bytes
             The response body. If the response is JSON, the data is parsed
             into a Python object.
 
@@ -322,12 +322,12 @@ class RegistryApi(metaclass=abc.ABCMeta):
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
             ``url`` parameter.
-        data : object, optional
+        data : `bytes`, optional
             The body of the request as a JSON-serializable object.
 
         Returns
         -------
-        data
+        data : bytes
             The response body. If the response is JSON, the data is parsed
             into a Python object.
 
@@ -365,12 +365,10 @@ class RegistryApi(metaclass=abc.ABCMeta):
         url_vars : `dict`, optional
             A dictionary of variable names and values to expand the templated
             ``url`` parameter.
-        data : object, optional
-            The body of the request as a JSON-serializable object.
 
         Returns
         -------
-        data
+        data : bytes
             The response body. If the response is JSON, the data is parsed
             into a Python object.
 
@@ -475,9 +473,9 @@ class RegistryApi(metaclass=abc.ABCMeta):
         -------
         schema : `dict`
             The Avro schema. The schema is pre-parsed by
-            `fastavro.parse_schema`.
+            `fastavro.parse_schema <fastavro._schema_py.parse_schema>`.
 
-        See also
+        See Also
         --------
         get_schema_by_subject
 
@@ -526,7 +524,8 @@ class RegistryApi(metaclass=abc.ABCMeta):
             keys are:
 
             ``"schema"``
-                The schema itself, preparsed by `fastavro.parse_schema`.
+                The schema itself, preparsed by `fastavro.parse_schema
+                <fastavro._schema_py.parse_schema>`.
             ``"subject"``
                 The subject this schema is registered under in the registry.
             ``"version"``
@@ -534,7 +533,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
             ``"id"``
                 The ID of this schema (compatible with `get_schema_by_id`).
 
-        See also
+        See Also
         --------
         get_schema_by_id
 
@@ -679,8 +678,7 @@ class SchemaCache:
 
     @staticmethod
     def _serialize_schema(schema: Mapping[str, Any]) -> str:
-        """Predictably serialize the schema so that it's hashable.
-        """
+        """Predictably serialize the schema so that it's hashable."""
         schema = fastavro.parse_schema(schema)
         return json.dumps(schema, sort_keys=True)
 
@@ -729,7 +727,7 @@ class SubjectCache:
         ValueError
             Raised if the schema does not exist in the cache.
 
-        See also
+        See Also
         --------
         get_schema
         get
@@ -752,14 +750,15 @@ class SubjectCache:
         Returns
         -------
         schema : `dict`
-            An Avro schema, preparsed by `fastavro.parse_schema`.
+            An Avro schema, preparsed by `fastavro.parse_schema
+            <fastavro._schema_py.parse_schema>`.
 
         Raises
         ------
         ValueError
             Raised if the schema does not exist in the cache.
 
-        See also
+        See Also
         --------
         get_id
         get
@@ -794,14 +793,15 @@ class SubjectCache:
             ``"id"``
                 ID of the schema in a Schema Registry.
             ``"schema"``
-                The Avro schema, preparsed by `fastavro.parse_schema`.
+                The Avro schema, preparsed by `fastavro.parse_schema
+                <fastavro._schema_py.parse_schema>`.
 
         Raises
         ------
         ValueError
             Raised if the schema does not exist in the cache.
 
-        See also
+        See Also
         --------
         get_id
         get_schema
