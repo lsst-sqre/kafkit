@@ -70,10 +70,6 @@ build-backend = 'setuptools.build_meta'
 where = ["src"]
 include = ["kafkit*"]
 
-[tool.setuptools.package-data]
-# https://setuptools.pypa.io/en/latest/userguide/datafiles.html#package-data
-kafkit = ["py.typed"]
-
 [tool.setuptools_scm]
 
 [tool.coverage.run]
