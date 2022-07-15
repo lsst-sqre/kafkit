@@ -1,5 +1,9 @@
 # Change log
 
+## 0.2.1 (2022-07-15)
+
+A `py.typed` file is now included to advertise typo annotations in Kafkit.
+
 ## 0.2.0 (2022-07-15)
 
 - Python versions 3.7 and earlier are no longer supported because Kafkit is adopting the `annotations` import from `__future__` and native support for `importlib.metadata`.
