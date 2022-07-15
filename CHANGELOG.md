@@ -1,9 +1,9 @@
 # Change log
 
-## 0.2.0 (unreleased)
+## 0.2.0 (2022-07-15)
 
-- Python versions 3.6 and earlier are no longer supported because Kafkit is adopting the `annotations` import from `__future__`.
-  Kafkit is explicitly tested with Python 3.7 and 3.8.
+- Python versions 3.7 and earlier are no longer supported because Kafkit is adopting the `annotations` import from `__future__` and native support for `importlib.metadata`.
+  Kafkit is explicitly tested with Python 3.8, 3.9, and 3.10.
 
 - We've added a `kafkit.ssl` module to help connect to Kafka brokers over TLS.
   The associated documentation includes a tutorial for working with the SSL certificates generated in a Kafka cluster managed by [Strimzi](https://strimzi.io).
@@ -16,8 +16,7 @@
 
 - We've significantly improved Kafkit's packaging and infrastructure:
 
-  - Migrate packaging metadata from `setup.py` to `setup.cfg`.
-  - Support PEP 518 with `pyproject.toml` (Kafkit continues to be a setuptools-based project).
+  - Migrate packaging metadata from `setup.py` to `pyproject.toml` (Kafkit continues to be a setuptools-based project).
   - Tox now runs tasks like tests, in conjunction with the existing Pytest set up.
   - Pre-commit hooks lint and format the code base.
   - Code style is now handled by Black (and in the documentation with blacken-docs).
