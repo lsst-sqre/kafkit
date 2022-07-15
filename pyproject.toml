@@ -30,7 +30,6 @@ dependencies = [
     "uritemplate",
     "fastavro",
 ]
-# dynamic = ["version", "readme"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -42,7 +41,6 @@ dev = [
     "pytest-asyncio",
     "pre-commit",
     "mypy",
-    # holdup<3 # bug in holdup 3?
     # Documentation
     "sphinx",
     "documenteer",
@@ -69,10 +67,6 @@ build-backend = 'setuptools.build_meta'
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 where = ["src"]
 include = ["kafkit*"]
-
-[tool.setuptools.package-data]
-# https://setuptools.pypa.io/en/latest/userguide/datafiles.html#package-data
-kafkit = ["py.typed"]
 
 [tool.setuptools_scm]
 
