@@ -3,14 +3,11 @@
 name = "kafkit"
 readme = "README.md"
 description = "Kafkit helps you write Kafka producers and consumers in Python with asyncio."
-license = {text = "MIT"}
+license = { text = "MIT" }
 authors = [
-    {name = "Association of Universities for Research in Astronomy, Inc. (AURA)", email = "sqre-admin@lists.lsst.org"},
+    { name = "Association of Universities for Research in Astronomy, Inc. (AURA)", email = "sqre-admin@lists.lsst.org" },
 ]
-keywords = [
-    "rubin",
-    "lsst",
-]
+keywords = ["rubin", "lsst"]
 # https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -26,14 +23,12 @@ classifiers = [
     "Typing :: Typed",
 ]
 requires-python = ">=3.8"
-dependencies = [
-    "uritemplate",
-    "fastavro",
-]
+dependencies = ["uritemplate", "fastavro"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 aiohttp = ["aiohttp"]
+httpx = ["httpx"]
 dev = [
     # Testing
     "coverage[toml]",
@@ -43,12 +38,7 @@ dev = [
     "mypy",
     # Documentation
     "sphinx",
-    "documenteer",
-    "lsst-sphinx-bootstrap-theme",
-    "sphinx-prompt",
-    "sphinx-automodapi",
-    "myst-parser",
-    "markdown-it-py[linkify]",
+    "documenteer[guide]",
 ]
 
 [project.urls]
@@ -56,11 +46,7 @@ Homepage = "https://kafkit.lsst.io"
 Source = "https://github.com/lsst-sqre/kafkit"
 
 [build-system]
-requires = [
-    "setuptools>=61",
-    "wheel",
-    "setuptools_scm[toml]>=6.2"
-]
+requires = ["setuptools>=61", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools.packages.find]
@@ -89,7 +75,7 @@ exclude_lines = [
     "raise NotImplementedError",
     "if 0:",
     "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:"
+    "if TYPE_CHECKING:",
 ]
 
 [tool.black]
@@ -114,7 +100,7 @@ exclude = '''
 # Reference: http://www.pydocstyle.org/en/stable/error_codes.html
 convention = "numpy"
 add_select = [
-    "D212" # Multi-line docstring summary should start at the first line
+    "D212", # Multi-line docstring summary should start at the first line
 ]
 add-ignore = [
     "D105", # Missing docstring in magic method
@@ -139,10 +125,7 @@ skip = ["docs/conf.py"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"
-python_files = [
-    "tests/*.py",
-    "tests/*/*.py"
-]
+python_files = ["tests/*.py", "tests/*/*.py"]
 markers = [
     "docker", # marks tests as requiring docker-compose (deselect with '-m "not docker"')"
 ]

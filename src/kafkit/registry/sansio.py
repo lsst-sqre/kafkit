@@ -592,7 +592,7 @@ class MockRegistryApi(RegistryApi):
         self,
         url: str = "http://registry:8081",
         status_code: int = 200,
-        headers: Mapping[str, str] = None,
+        headers: Optional[Mapping[str, str]] = None,
         body: Any = b"",
     ) -> None:
         super().__init__(url=url)
