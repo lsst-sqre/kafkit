@@ -38,12 +38,7 @@ dev = [
     "mypy",
     # Documentation
     "sphinx",
-    "documenteer",
-    "lsst-sphinx-bootstrap-theme",
-    "sphinx-prompt",
-    "sphinx-automodapi",
-    "myst-parser",
-    "markdown-it-py[linkify]",
+    "documenteer[guide]",
 ]
 
 [project.urls]

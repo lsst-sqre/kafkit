@@ -1,0 +1,28 @@
+[project]
+title = "Kafkit"
+copyright = "2019-2023 Association of Universities for Research in Astronomy, Inc. (AURA)"
+
+[project.python]
+package = "kafkit"
+
+[sphinx]
+rst_epilog_file = "_rst_epilog.rst"
+nitpick_ignore = [
+    [
+        "py:obj",
+        "aiokafka.AIOKafkaProducer.send_and_wait",
+    ],
+    [
+        "py:class",
+        "httpx.AsyncClient",
+    ],
+]
+
+[sphinx.intersphinx.projects]
+python = "https://docs.python.org/3/"
+aiohttp = "https://aiohttp.readthedocs.io/en/stable/"
+aiokafka = "https://aiokafka.readthedocs.io/en/stable/"
+fastavro = "https://fastavro.readthedocs.io/en/latest/"
+
+[sphinx.linkcheck]
+ignore = ['^https://jira.lsstcorp.org/browse/', '^http://registry:8081']

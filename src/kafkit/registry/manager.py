@@ -67,7 +67,7 @@ class RecordNameSchemaManager:
       ``TopicNameStrategy``, where subjects are named for the topic with
       ``-key`` or ``-value`` suffixes.
 
-    For more information, see :doc:`/recordnameschemamanager-howto` in
+    For more information, see :doc:`/guide/recordnameschemamanager-howto` in
     the user guide.
     """
 
