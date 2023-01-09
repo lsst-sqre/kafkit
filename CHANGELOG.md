@@ -1,8 +1,15 @@
 # Change log
 
+## Unreleased
+
+New features:
+
+- New [HTTPX](https://www.python-httpx.org) support with `kafkit.registry.httpx.RegistryApi`, in addition to the existing aiohttp support.
+- Documentation is now built with the new Rubin Observatory user guide theme and Sphinx configuration.
+
 ## 0.2.1 (2022-07-15)
 
-A `py.typed` file is now included to advertise typo annotations in Kafkit.
+A `py.typed` file is now included to advertise type annotations in Kafkit.
 
 ## 0.2.0 (2022-07-15)
 
