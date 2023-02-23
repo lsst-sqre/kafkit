@@ -1,11 +1,13 @@
 # Change log
 
-## Unreleased
+## 0.3.0 (2023-02-23)
 
 New features:
 
 - New [HTTPX](https://www.python-httpx.org) support with `kafkit.registry.httpx.RegistryApi`, in addition to the existing aiohttp support.
 - Documentation is now built with the new Rubin Observatory user guide theme and Sphinx configuration.
+- The `__named_schemas` annotation added by FastAvro is now stripped, in addition to `__fastavro_parsed`. Via @hhromic 🎉
+- Kafkit is now also available on Conda-Forge (feedstock URL: https://github.com/conda-forge/kafkit-feedstock).
 
 ## 0.2.1 (2022-07-15)
 
