@@ -219,6 +219,7 @@ async def test_register_schema() -> None:
     assert "schema" in sent_json
     sent_schema = json.loads(sent_json["schema"])
     assert "__fastavro_parsed" not in sent_schema
+    assert "__named_schemas" not in sent_schema
     assert sent_schema["name"] == "test-schemas.schema1"
 
     # Check that the schema is in the cache and is parsed
