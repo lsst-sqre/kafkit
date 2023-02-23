@@ -394,10 +394,10 @@ class RegistryApi(metaclass=abc.ABCMeta):
         removing any fastavro hints and dumping to a string.
         """
         schema = dict(copy.deepcopy(schema))
-        try:
+        if "__fastavro_parsed" in schema:
             del schema["__fastavro_parsed"]
-        except KeyError:
-            pass
+        if "__named_schemas" in schema:
+            del schema["__named_schemas"]
         # sort keys for repeatable tests
         return json.dumps(schema, sort_keys=True)
 
