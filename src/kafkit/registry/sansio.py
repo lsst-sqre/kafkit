@@ -832,6 +832,12 @@ class SubjectCache:
     ) -> None:
         """Insert a subject version into the cache.
 
+        If the subject version being cached is already in the schema cache,
+        then only one of ``schema_id`` or ``schema`` need to be passed to this
+        method. However, if the schema isn't cached, then both ``schema_id``
+        and ``schema`` need to be set. The ``schema_id`` and ``schema`` are
+        added to the underlying schema cache.
+
         Parameters
         ----------
         subject : `str`
@@ -839,9 +845,9 @@ class SubjectCache:
         version : `int`
             The version number of the schema in the subject.
         schema_id : `int`, optional
-            ID of the schema in a Schema Registry. See Notes.
+            ID of the schema in a Schema Registry.
         schema : `dict`, optional
-            The Avro schema itself. See Notes.
+            The Avro schema itself.
 
         Raises
         ------
@@ -850,15 +856,7 @@ class SubjectCache:
             versions, like "latest," cannot be cached.
         ValueError
             Raised if the ``schema_id`` or ``schema`` parameters are needed
-            but aren't set. See Notes.
-
-        Notes
-        -----
-        If the subject version being cached is already in the schema cache,
-        then only one of ``schema_id`` or ``schema`` need to be passed to this
-        method. However, if the schema isn't cached, then both ``schema_id``
-        and ``schema`` need to be set. The ``schema_id`` and ``schema`` are
-        added to the underlying schema cache.
+            but aren't set.
         """
         if not isinstance(version, int):
             raise TypeError(
