@@ -203,26 +203,36 @@ async def test_register_schema() -> None:
     }
 
     # Body that we expect the registry API to return given the request.
-    expected_body = json.dumps({"id": 1}).encode("utf-8")
+    expected_body = [
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "test-schemas.schema1",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(input_schema),
+            }
+        ).encode("utf-8"),
+    ]
 
     client = MockRegistryApi(url="http://registry:8081", body=expected_body)
     schema_id = await client.register_schema(input_schema)
     assert schema_id == 1
 
     # Test details of the request itself
-    assert client.method == "POST"
+    assert client.requests[0]["method"] == "POST"
     assert (
-        client.url
+        client.requests[0]["url"]
         == "http://registry:8081/subjects/test-schemas.schema1/versions"
     )
-    sent_json = json.loads(client.body)
+    sent_json = json.loads(client.requests[0]["body"])
     assert "schema" in sent_json
     sent_schema = json.loads(sent_json["schema"])
     assert "__fastavro_parsed" not in sent_schema
     assert "__named_schemas" not in sent_schema
     assert sent_schema["name"] == "test-schemas.schema1"
 
-    # Check that the schema is in the cache and is parsed
+    # Check that the schema is in the schema cache and is parsed
     # Value of type "Union[int, Dict[str, Any]]" is not indexable
     cached_schema = client.schema_cache[1]
     assert cached_schema["name"] == "test-schemas.schema1"
@@ -231,6 +241,48 @@ async def test_register_schema() -> None:
     # Make a second call to get the schema out
     new_schema_id = await client.register_schema(input_schema)
     assert new_schema_id == schema_id
+
+
+@pytest.mark.asyncio
+async def test_register_schema_with_different_subjects():
+    input_schema = {
+        "type": "record",
+        "name": "schema1",
+        "namespace": "test-schemas",
+        "fields": [{"name": "a", "type": "int"}],
+    }
+    # Responses returned from the MockRegistryApi, in turn
+    mock_responses = [
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "subject1",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(input_schema),
+            }
+        ).encode("utf-8"),
+        json.dumps({"id": 1}).encode("utf-8"),
+        json.dumps(
+            {
+                "subject": "subject2",
+                "version": 1,
+                "id": 1,
+                "schema": json.dumps(input_schema),
+            }
+        ).encode("utf-8"),
+    ]
+
+    client = MockRegistryApi(url="http://registry:8081", body=mock_responses)
+    schema_id = await client.register_schema(input_schema, "subject1")
+    subject_cache_entry = client.subject_cache.get("subject1", 1)
+    assert schema_id == 1
+    assert subject_cache_entry["id"] == schema_id
+
+    await client.register_schema(input_schema, "subject2")
+    subject_cache_entry2 = client.subject_cache.get("subject2", 1)
+    assert schema_id == 1
+    assert subject_cache_entry2["id"] == schema_id
 
 
 @pytest.mark.asyncio
