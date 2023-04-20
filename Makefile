@@ -5,7 +5,7 @@ help:
 
 .PHONY: init
 init:
-	pip install -e ".[aiohttp,httpx,dev]"
+	pip install -e ".[aiohttp,httpx,pydantic,dev]"
 	pip install -U tox pre-commit
 	pre-commit install
 	rm -rf .tox
