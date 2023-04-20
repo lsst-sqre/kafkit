@@ -1,4 +1,6 @@
-"""Combined local and registry-based schema management."""
+"""Manage schemas as avro files based on the record name subject name
+strategy.
+"""
 
 from __future__ import annotations
 
