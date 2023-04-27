@@ -7,9 +7,11 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from kafkit.registry.serializer import PolySerializer
+
+from ..utils import get_avro_fqn
 
 if TYPE_CHECKING:
     from kafkit.registry.sansio import RegistryApi
@@ -96,39 +98,8 @@ class RecordNameSchemaManager:
             if self._suffix:
                 schema["name"] = f'{schema["name"]}{self._suffix}'
 
-            fqn = self._get_fqn(schema)
+            fqn = get_avro_fqn(schema)
             self.schemas[fqn] = schema
-
-    @staticmethod
-    def _get_fqn(schema: Mapping[str, Any]) -> str:
-        """Get the fully-qualified name of an Avro schema.
-
-        Parameters
-        ----------
-        schema : `dict`
-            The Avro schema.
-
-        Returns
-        -------
-        str
-            The fully-qualified name.
-
-        Notes
-        -----
-        The decision sequence is:
-
-        - If the ``name`` field includes a period (``.``), the ``name`` field
-          is treated as a fully-qualified name.
-        - Otherwise, if the schema includes a ``namespace`` field, the
-          fully-qualified name is ``{{namespace}}.{{name}}``.
-        - Otherwise, the ``name`` is treated as the fully-qualified name.
-        """
-        if "." not in schema["name"] and "namespace" in schema:
-            fqn = ".".join((schema["namespace"], schema["name"]))
-        else:
-            fqn = schema["name"]
-        assert isinstance(fqn, str)
-        return fqn
 
     async def register_schemas(
         self, *, compatibility: Optional[str] = None
