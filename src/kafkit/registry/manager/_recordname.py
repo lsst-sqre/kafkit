@@ -9,8 +9,6 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional
 
-from kafkit.registry.errors import RegistryBadRequestError
-from kafkit.registry.sansio import CompatibilityType
 from kafkit.registry.serializer import PolySerializer
 
 if TYPE_CHECKING:
@@ -76,10 +74,11 @@ class RecordNameSchemaManager:
     def __init__(
         self, *, root: Path, registry: RegistryApi, suffix: str = ""
     ) -> None:
-        self._logger = logging.getLogger(__name__)
-        self._root = root
         self._registry = registry
+        self._root = root
         self._suffix = suffix
+
+        self._logger = logging.getLogger(__name__)
 
         self._serializer = PolySerializer(registry=self._registry)
         self.schemas: Dict[str, Any] = {}
@@ -162,105 +161,11 @@ class RecordNameSchemaManager:
             documentation
             <https://docs.confluent.io/current/schema-registry/avro.html>`__.
         """
-        if isinstance(compatibility, str):
-            try:
-                CompatibilityType[compatibility]
-            except KeyError:
-                raise ValueError(
-                    f"Compatibility setting {compatibility!r} is not in the "
-                    f"allowed set: {[v.value for v in CompatibilityType]}"
-                )
         for subject_name, schema in self.schemas.items():
-            await self._register_schema(
-                subject_name=subject_name,
+            await self._registry.register_schema(
                 schema=schema,
-                desired_compatibility=compatibility,
-            )
-
-    async def _register_schema(
-        self,
-        *,
-        subject_name: str,
-        schema: Dict[str, Any],
-        desired_compatibility: Optional[str],
-    ) -> int:
-        """Register a schema with the Schema Registry
-
-        Parameters
-        ----------
-        subject_name : `str`
-            The name of a subject in the Confluent Schema Registry, which
-            may already exist or not.
-        desired_compatibility : `str`
-            A subject compatibility setting. See docs for `register_schemas`
-            for possible values.
-
-        Returns
-        -------
-        int
-            Unique ID of the schema in the Schema in the Schema Registry.
-
-        Notes
-        -----
-        This method can be safely run multiple times with the same schema; in
-        each instance the same schema ID will be returned.
-        """
-        schema_id = await self._registry.register_schema(
-            schema, subject=subject_name
-        )
-
-        if desired_compatibility is not None:
-            await self._set_subject_compatibility(
-                subject_name=subject_name, compatibility=desired_compatibility
-            )
-        return schema_id
-
-    async def _set_subject_compatibility(
-        self, *, subject_name: str, compatibility: str
-    ) -> None:
-        """Set the compatibility for a Schema Registry subject.
-
-        Parameters
-        ----------
-        subject_name : `str`
-            The name of a subject that exists in the Confluent Schema Registry.
-        compatibility : `str`
-            A subject compatibility setting. See docs for `register_schemas`
-            for possible values.
-        """
-        try:
-            subject_config = await self._registry.get(
-                "/config{/subject}", url_vars={"subject": subject_name}
-            )
-        except RegistryBadRequestError:
-            self._logger.info(
-                "No existing configuration for this subject: %s", subject_name
-            )
-            # Create a mock config that forces a reset
-            subject_config = {"compatibilityLevel": None}
-
-        self._logger.debug(
-            "Current config subject=%s config=%s", subject_name, subject_config
-        )
-
-        if subject_config["compatibilityLevel"] != compatibility:
-            await self._registry.put(
-                "/config{/subject}",
-                url_vars={"subject": subject_name},
-                data={"compatibility": compatibility},
-            )
-            self._logger.info(
-                "Reset subject compatibility level. "
-                "subject=%s compatibility=%s",
-                subject_name,
-                compatibility,
-            )
-        else:
-            self._logger.debug(
-                "Existing subject compatibility level is good. "
-                "subject=%s compatibility=%s",
-                subject_name,
-                compatibility,
+                subject=subject_name,
+                compatibility=compatibility,
             )
 
     async def serialize(self, *, data: Any, name: str) -> bytes:
