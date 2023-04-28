@@ -113,14 +113,15 @@ async def test_deserializer() -> None:
     deserializer = Deserializer(registry=client)
 
     response_1 = await deserializer.deserialize(data_1)
+    # Test attribute and key-based access to message info
     assert response_1["id"] == schema1_id
     assert response_1["message"] == message_1
-    assert "schema" not in response_1
+    assert response_1.id == schema1_id
+    assert response_1.message == message_1
 
-    response_2 = await deserializer.deserialize(data_2, include_schema=True)
+    response_2 = await deserializer.deserialize(data_2)
     assert response_2["id"] == schema2_id
     assert response_2["message"] == message_2
-    assert "schema" in response_2
     assert response_2["schema"]["name"] == "test-schemas.schema2"
 
 
