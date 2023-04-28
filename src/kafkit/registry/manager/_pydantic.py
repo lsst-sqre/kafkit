@@ -8,12 +8,14 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Iterable, Optional, Type
 
-from ..serializer import PolySerializer
+from dataclasses_avroschema.avrodantic import AvroBaseModel
+
+from kafkit.registry.errors import UnmanagedSchemaError
+
+from ..serializer import Deserializer, PolySerializer
 from ..utils import get_avro_fqn
 
 if TYPE_CHECKING:
-    from dataclasses_avroschema.avrodantic import AvroBaseModel
-
     from kafkit.registry.sansio import RegistryApi
 
 __all__ = ["PydanticSchemaManager"]
@@ -57,6 +59,7 @@ class PydanticSchemaManager:
         self._logger = logging.getLogger(__name__)
 
         self._serializer = PolySerializer(registry=self._registry)
+        self._deserializer = Deserializer(registry=self._registry)
 
         # A mapping of fully-qualified schema names to models.
         self._models: dict[str, CachedSchema] = {}
@@ -102,6 +105,11 @@ class PydanticSchemaManager:
         ----------
         data
             The data to serialize.
+
+        Returns
+        -------
+        bytes
+            The serialized data in the Confluent Wire Format.
         """
         schema_fqn = self._get_model_fqn(data)
 
@@ -112,8 +120,40 @@ class PydanticSchemaManager:
             avro_schema = cached_model.schema
 
         return await self._serializer.serialize(
-            data, schema=avro_schema, subject=schema_fqn
+            data.to_dict(), schema=avro_schema, subject=schema_fqn
         )
+
+    async def deserialize(self, data: bytes) -> AvroBaseModel:
+        """Deserialize the data.
+
+        Parameters
+        ----------
+        data
+            The data in the Confluent Wire Format to deserialize into a
+            Pydantic object.
+
+        Returns
+        -------
+        AvroBaseModel
+            The deserialized data.
+
+        Raises
+        ------
+        UnmanagedSchemaError
+            Raised if the Pydantic model corresponding to the message's
+            schema is not registered through the manager.
+        """
+        message_info = await self._deserializer.deserialize(data)
+        schema_fqn = get_avro_fqn(message_info.schema)
+        if self._suffix:
+            schema_fqn += self._suffix
+        if schema_fqn not in self._models:
+            raise UnmanagedSchemaError(
+                f"Schema named {schema_fqn} is not registered with the manager"
+            )
+
+        cached_model = self._models[schema_fqn]
+        return cached_model.model.parse_obj(message_info.message)
 
     def _cache_model(
         self, model: AvroBaseModel | Type[AvroBaseModel]
@@ -121,20 +161,28 @@ class PydanticSchemaManager:
         schema_fqn = self._get_model_fqn(model)
         avro_schema = model.avro_schema_to_python()
 
-        self._models[schema_fqn] = CachedSchema(avro_schema, model)
+        if isinstance(model, AvroBaseModel):
+            model_type = model.__class__
+        else:
+            model_type = model
+
+        self._models[schema_fqn] = CachedSchema(avro_schema, model_type)
 
         return self._models[schema_fqn]
 
     def _get_model_fqn(
         self, model: AvroBaseModel | Type[AvroBaseModel]
     ) -> str:
+        # Mypy can't detect the Meta class on the model, so we have to ignore
+        # those lines.
+
         try:
-            name = model.Meta.schema_name
+            name = model.Meta.schema_name  # type: ignore
         except AttributeError:
             name = model.__class__.__name__
 
         try:
-            namespace = model.Meta.namespace
+            namespace = model.Meta.namespace  # type: ignore
         except AttributeError:
             namespace = None
 

@@ -8,6 +8,7 @@ from kafkit.registry.errors import (
     RegistryError,
     RegistryHttpError,
     RegistryRedirectionError,
+    UnmanagedSchemaError,
 )
 from kafkit.registry.serializer import (
     Deserializer,
@@ -26,4 +27,5 @@ __all__ = [
     "RegistryError",
     "RegistryHttpError",
     "RegistryRedirectionError",
+    "UnmanagedSchemaError",
 ]

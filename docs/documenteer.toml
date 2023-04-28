@@ -16,6 +16,14 @@ nitpick_ignore = [
         "py:class",
         "httpx.AsyncClient",
     ],
+    [
+        "py:class",
+        "AvroBaseModel",
+    ],
+    [
+        "py:class",
+        "dataclasses_avroschema.avrodantic.AvroBaseModel",
+    ],
 ]
 
 [sphinx.intersphinx.projects]
