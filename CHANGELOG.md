@@ -1,5 +1,11 @@
 # Change log
 
+## Unreleased
+
+### New features
+
+- New `PydanticSchemaManager` enables you to use [Pydantic](https://pydantic-docs.helpmanual.io/) models as Avro schemas. Like the `RecordNameSchemaManager`, this new manager handles schema registration for you. To serialize a message, you simply supply a Pydantic object. The manager will also deserialize messages into Pydantic objects if the message's schema corresponds to a managed Pydantic model. Overall this feature provides end-to-end type checking of messages from development to production.
+
 ## 0.3.0 (2023-02-23)
 
 New features:
