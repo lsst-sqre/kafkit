@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -13,6 +14,11 @@ from pydantic import Field
 
 from kafkit.registry.httpx import RegistryApi
 from kafkit.registry.manager import PydanticSchemaManager
+
+
+def current_datetime() -> datetime:
+    """Return the current datetime."""
+    return datetime.now(tz=timezone.utc)
 
 
 class SlackMessageType(str, Enum):
@@ -64,6 +70,21 @@ class SquarebotMessage(AvroBaseModel):
         schema_name = "message"
 
 
+class SquarebotHeartbeat(AvroBaseModel):
+    """Model for a Squarebot heartbeat message."""
+
+    timestamp: datetime = Field(
+        description="The timestamp of the heartbeat.",
+        default_factory=current_datetime,
+    )
+
+    class Meta:
+        """Metadata for the model."""
+
+        namespace = "squarebot"
+        schema_name = "heartbeat"
+
+
 @pytest.mark.docker
 @pytest.mark.skipif(
     os.getenv("SCHEMA_REGISTRY_URL") is None,
@@ -99,6 +120,9 @@ async def test_pydantic_schema_manager() -> None:
         # Check that the deserialized message is the same as the input
         assert isinstance(output_message, SquarebotMessage)
         assert output_message == input_message
+
+        # Automatically register the heartbeat schema and send a heartbeat
+        _ = await manager.serialize(SquarebotHeartbeat())
 
 
 @pytest.mark.docker
@@ -136,3 +160,6 @@ async def test_pydantic_schema_manager_suffixed() -> None:
         # Check that the deserialized message is the same as the input
         assert isinstance(output_message, SquarebotMessage)
         assert output_message == input_message
+
+        # Automatically register the heartbeat schema and send a heartbeat
+        _ = await manager.serialize(SquarebotHeartbeat())
