@@ -12,6 +12,7 @@ from dataclasses_avroschema.avrodantic import AvroBaseModel
 from httpx import AsyncClient
 from pydantic import Field
 
+from kafkit.registry import UnmanagedSchemaError
 from kafkit.registry.httpx import RegistryApi
 from kafkit.registry.manager import PydanticSchemaManager
 
@@ -85,6 +86,17 @@ class SquarebotHeartbeat(AvroBaseModel):
         schema_name = "heartbeat"
 
 
+AVRO_SCHEMA = {
+    "type": "record",
+    "name": "schema1",
+    "namespace": "test-schemas",
+    "fields": [
+        {"name": "a", "type": "int"},
+        {"name": "b", "type": "string"},
+    ],
+}
+
+
 @pytest.mark.docker
 @pytest.mark.skipif(
     os.getenv("SCHEMA_REGISTRY_URL") is None,
@@ -123,6 +135,19 @@ async def test_pydantic_schema_manager() -> None:
 
         # Automatically register the heartbeat schema and send a heartbeat
         _ = await manager.serialize(SquarebotHeartbeat())
+
+        # Register a non-Pydantic schema to demonstrate handling
+        # unmanaged schemas
+        schema_id = await manager._registry.register_schema(
+            schema=AVRO_SCHEMA,
+            subject="test-schemas.schema1",
+        )
+        unmanaged_message = await manager._serializer.serialize(
+            {"a": 1, "b": "test"},
+            schema_id=schema_id,
+        )
+        with pytest.raises(UnmanagedSchemaError):
+            await manager.deserialize(unmanaged_message)
 
 
 @pytest.mark.docker
@@ -163,3 +188,16 @@ async def test_pydantic_schema_manager_suffixed() -> None:
 
         # Automatically register the heartbeat schema and send a heartbeat
         _ = await manager.serialize(SquarebotHeartbeat())
+
+        # Register a non-Pydantic schema to demonstrate handling
+        # unmanaged schemas
+        schema_id = await manager._registry.register_schema(
+            schema=AVRO_SCHEMA,
+            subject="test-schemas.schema1",
+        )
+        unmanaged_message = await manager._serializer.serialize(
+            {"a": 1, "b": "test"},
+            schema_id=schema_id,
+        )
+        with pytest.raises(UnmanagedSchemaError):
+            await manager.deserialize(unmanaged_message)
