@@ -43,9 +43,6 @@ Pre-commit hooks
 The pre-commit hooks, which are automatically installed by running the :command:`make init` command on :ref:`set up <dev-environment>`, ensure that files are valid and properly formatted.
 Some pre-commit hooks automatically reformat code:
 
-``seed-isort-config``
-    Adds configuration for isort to the :file:`pyproject.toml` file.
-
 ``isort``
     Automatically sorts imports in Python modules.
 
@@ -73,13 +70,13 @@ You can also run tox_, which tests the library the same way that the CI workflow
 
 .. code-block:: sh
 
-   tox
+   tox run
 
 To see a listing of test environments, run:
 
 .. code-block:: sh
 
-   tox -av
+   tox list
 
 .. _dev-build-docs:
 
@@ -92,7 +89,7 @@ Documentation is built with Sphinx_:
 
 .. code-block:: sh
 
-   tox -e docs
+   tox run -e docs
 
 The build documentation is located in the :file:`docs/_build/html` directory.
 
@@ -101,22 +98,20 @@ The build documentation is located in the :file:`docs/_build/html` directory.
 Updating the change log
 =======================
 
-Each pull request should update the change log (:file:`CHANGELOG.rst`).
+Each pull request should update the change log (:file:`CHANGELOG.md`).
 Add a description of new features and fixes as list items under a section at the top of the change log called "Unreleased:"
 
-.. code-block:: rst
+.. code-block:: md
 
-   Unreleased
-   ----------
+   ## Unreleased
 
    - Description of the feature or fix.
 
-If the next version is known (because Kafkit's master branch is being prepared for a new major or minor version), the section may contain that version information:
+If the next version is known (because Kafkit's main branch is being prepared for a new major or minor version), the section may contain that version information:
 
-.. code-block:: rst
+.. code-block:: md
 
-   X.Y.0 (unreleased)
-   ------------------
+   ## X.Y.0 (unreleased)
 
    - Description of the feature or fix.
 
@@ -124,8 +119,7 @@ If the exact version and release date is known (:doc:`because a release is being
 
 .. code-block:: rst
 
-   X.Y.0 (YYYY-MM-DD)
-   ------------------
+   ## X.Y.0 (YYYY-MM-DD)
 
    - Description of the feature or fix.
 

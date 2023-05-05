@@ -17,8 +17,8 @@ from typing import Any, Dict, Mapping, Optional, Tuple, Union, overload
 
 import fastavro
 
-from kafkit.httputils import format_url, parse_content_type
-from kafkit.registry.errors import (
+from ..httputils import format_url, parse_content_type
+from .errors import (
     RegistryBadRequestError,
     RegistryBrokenError,
     RegistryHttpError,
@@ -128,6 +128,7 @@ class RegistryApi(metaclass=abc.ABCMeta):
         self.url = url
         self._schema_cache = SchemaCache()
         self._subject_cache = SubjectCache(self._schema_cache)
+        self._logger = logging.getLogger(__name__)
 
     @property
     def schema_cache(self) -> SchemaCache:
@@ -402,7 +403,10 @@ class RegistryApi(metaclass=abc.ABCMeta):
         return json.dumps(schema, sort_keys=True)
 
     async def register_schema(
-        self, schema: Mapping[str, Any], subject: Optional[str] = None
+        self,
+        schema: Mapping[str, Any],
+        subject: Optional[str] = None,
+        compatibility: Optional[str] = None,
     ) -> int:
         """Register a schema or get the ID of an existing schema.
 
@@ -416,6 +420,11 @@ class RegistryApi(metaclass=abc.ABCMeta):
         subject : `str`, optional
             The subject to register the schema under. If not provided, the
             fully-qualified name of the schema is adopted as the subject name.
+        compatibility : `str`, optional
+            The compatibility level to use for the subject. If not provided,
+            the existing compatibility level is used (or the server's default
+            compatibility level if subject does not have a specific
+            compatibility level).
 
         Returns
         -------
@@ -457,7 +466,57 @@ class RegistryApi(metaclass=abc.ABCMeta):
         # add to cache
         self.schema_cache.insert(schema, result["id"])
 
+        if compatibility is not None:
+            await self.set_subject_compatibility(subject, compatibility)
+
         return result["id"]
+
+    async def set_subject_compatibility(
+        self, subject: str, compatibility: str
+    ) -> None:
+        # Validate compatibility setting
+        try:
+            CompatibilityType[compatibility]
+        except KeyError:
+            raise ValueError(
+                f"Compatibility setting {compatibility!r} is not in the "
+                f"allowed set: {[v.value for v in CompatibilityType]}"
+            )
+
+        try:
+            subject_config = await self.get(
+                "/config{/subject}", url_vars={"subject": subject}
+            )
+        except RegistryBadRequestError:
+            self._logger.info(
+                "No existing configuration for this subject: %s", subject
+            )
+            # Create a mock config that forces a reset
+            subject_config = {"compatibilityLevel": None}
+
+        self._logger.debug(
+            "Current config subject=%s config=%s", subject, subject_config
+        )
+
+        if subject_config["compatibilityLevel"] != compatibility:
+            await self.put(
+                "/config{/subject}",
+                url_vars={"subject": subject},
+                data={"compatibility": compatibility},
+            )
+            self._logger.info(
+                "Reset subject compatibility level. "
+                "subject=%s compatibility=%s",
+                subject,
+                compatibility,
+            )
+        else:
+            self._logger.debug(
+                "Existing subject compatibility level is good. "
+                "subject=%s compatibility=%s",
+                subject,
+                compatibility,
+            )
 
     async def get_schema_by_id(self, schema_id: int) -> Dict[str, Any]:
         """Get a schema from the registry given its ID.

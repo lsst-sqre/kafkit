@@ -5,6 +5,7 @@ Confluent Schema Registry.
 from __future__ import annotations
 
 import struct
+from dataclasses import dataclass
 from io import BytesIO
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
@@ -17,6 +18,7 @@ __all__ = [
     "Serializer",
     "PolySerializer",
     "Deserializer",
+    "MessageInfo",
 ]
 
 
@@ -204,6 +206,59 @@ def _make_message(
     return message_fh.read()
 
 
+@dataclass
+class MessageInfo:
+    """A message, along with schema information.
+
+    Parameters
+    ----------
+    id
+        The ID of the schema (an `int`) in the Schema Registry. This uniquely
+        identifies the message's schema.
+    schema
+        The schema, as a Python object.
+    message
+        The message itself, as a decoded Python object.
+
+    Attributes
+    ----------
+    id
+        The ID of the schema (an `int`) in the Schema Registry. This uniquely
+        identifies the message's schema.
+    schema
+        The schema, as a Python object.
+    message
+        The message itself, as a decoded Python object.
+    """
+
+    id: int
+    """The ID of the schema (an `int`) in the Schema Registry. This uniquely
+    identifies the message's schema.
+    """
+
+    schema: dict[str, Any]
+    """The schema, as a Python object."""
+
+    message: Any
+    """The message itself, as a decoded Python object."""
+
+    def __getitem__(self, key: str) -> Any:
+        """Get info by key (for backwards compatibility).
+
+        This method is for backwards-compatibility when
+        `Deserializer.deserialize` returned a dict. Attribute-based access is
+        recommended, e.g. ``message_info.id``, to enable type checking.
+        """
+        if key == "id":
+            return self.id
+        elif key == "message":
+            return self.message
+        elif key == "schema":
+            return self.schema
+
+        raise KeyError(f"Unknown key: {key}")
+
+
 class Deserializer:
     """An Avro message deserializer that understands the Confluent Wire Format
     and obtains schemas on-demand from a Confluent Schema Registry.
@@ -246,9 +301,7 @@ class Deserializer:
     def __init__(self, *, registry: RegistryApi) -> None:
         self._registry = registry
 
-    async def deserialize(
-        self, data: bytes, include_schema: bool = False
-    ) -> Dict[str, Any]:
+    async def deserialize(self, data: bytes) -> MessageInfo:
         """Deserialize a message.
 
         Parameters
@@ -256,26 +309,11 @@ class Deserializer:
         data : `bytes`
             The encoded message, usually obtained directly from a Kafka
             consumer. The message must be in the Confluent Wire Format.
-        include_schema : `bool`, optional
-            If `True`, the schema itself is included in the returned value.
-            This is useful if your application operates on many different
-            types of messages, and needs a convenient way to introspect
-            a message's type.
 
         Returns
         -------
-        message_info : `dict`
-            The deserialized message is wrapped in a dictionary to include
-            metadata. The keys are:
-
-            ``'id'``
-                The ID of the schema (an `int`) in the Schema Registry. This
-                uniquely identifies the message's schema.
-            ``'message'``
-                The message itself, as a decoded Python object.
-            ``'schema'``
-                The schema, as a Python object. This key is only included
-                when ``include_schema`` is `True`.
+        MessageInfo
+            The deserialized message and schema information.
         """
         schema_id, message_data = unpack_wire_format_data(data)
         schema = await self._registry.get_schema_by_id(schema_id)
@@ -283,10 +321,7 @@ class Deserializer:
         message_fh = BytesIO(message_data)
         message_fh.seek(0)
         message = fastavro.schemaless_reader(message_fh, schema)
-        result = {"id": schema_id, "message": message}
-        if include_schema:
-            result["schema"] = schema
-        return result
+        return MessageInfo(schema_id, schema, message)
 
 
 def pack_wire_format_prefix(schema_id: int) -> bytes:

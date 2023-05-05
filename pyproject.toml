@@ -17,18 +17,20 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: POSIX",
     "Typing :: Typed",
 ]
 requires-python = ">=3.8"
-dependencies = ["uritemplate", "fastavro"]
+dependencies = ["fastavro", "uritemplate"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 aiohttp = ["aiohttp"]
 httpx = ["httpx"]
+pydantic = ["dataclasses-avroschema[pydantic]"]
 dev = [
     # Testing
     "coverage[toml]",

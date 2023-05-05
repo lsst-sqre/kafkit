@@ -6,6 +6,7 @@ __all__ = [
     "RegistryRedirectionError",
     "RegistryBadRequestError",
     "RegistryBrokenError",
+    "UnmanagedSchemaError",
 ]
 
 from typing import Any, Optional
@@ -61,3 +62,9 @@ class RegistryBadRequestError(RegistryHttpError):
 
 class RegistryBrokenError(RegistryHttpError):
     """An excpetion if the server is down (5XX errors)."""
+
+
+class UnmanagedSchemaError(Exception):
+    """An exception for when a schema is not managed by the Registry, and
+    therefore cannot be deserialized into a native Python object.
+    """
