@@ -17,5 +17,8 @@ Kafkit API reference
 .. automodapi:: kafkit.registry.sansio
    :no-inheritance-diagram:
 
+.. automodapi:: kafkit.settings
+   :no-inheritance-diagram:
+
 .. automodapi:: kafkit.ssl
    :no-inheritance-diagram:

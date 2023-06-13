@@ -30,7 +30,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 aiohttp = ["aiohttp"]
 httpx = ["httpx"]
-pydantic = ["dataclasses-avroschema[pydantic]"]
+pydantic = ["pydantic", "dataclasses-avroschema[pydantic]"]
 dev = [
     # Testing
     "coverage[toml]",
