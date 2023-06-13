@@ -30,7 +30,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 aiohttp = ["aiohttp"]
 httpx = ["httpx"]
-pydantic = ["dataclasses-avroschema[pydantic]"]
+pydantic = ["pydantic", "dataclasses-avroschema[pydantic]"]
 dev = [
     # Testing
     "coverage[toml]",
@@ -140,3 +140,16 @@ strict_equality = true
 warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_ignores = true
+
+[tool.scriv]
+categories = [
+    "Backwards-incompatible changes",
+    "New features",
+    "Bug fixes",
+    "Other changes",
+]
+entry_title_template = "{{ version }} ({{ date.strftime('%Y-%m-%d') }})"
+format = "md"
+md_header_level = "2"
+new_fragment_template = "file:changelog.d/_template.md"
+skip_fragments = "_template.md"

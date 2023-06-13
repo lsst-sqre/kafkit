@@ -24,6 +24,18 @@ nitpick_ignore = [
         "py:class",
         "dataclasses_avroschema.avrodantic.AvroBaseModel",
     ],
+    [
+        "py:class",
+        "pydantic.env_settings.BaseSettings",
+    ],
+    [
+        "py:class",
+        "pydantic.main.BaseModel",
+    ],
+    [
+        "py:class",
+        "pydantic.utils.Representation",
+    ]
 ]
 
 [sphinx.intersphinx.projects]
