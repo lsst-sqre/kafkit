@@ -31,7 +31,7 @@ dynamic = ["version"]
 aiohttp = ["aiohttp"]
 httpx = ["httpx"]
 pydantic = ["pydantic", "dataclasses-avroschema[pydantic]"]
-fastapi = ["fastapi"]
+aiokafka = ["aiokafka"]
 dev = [
     # Testing
     "coverage[toml]",
