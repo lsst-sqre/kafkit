@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 0 # full history for setuptools_scm
 
       - name: Build and publish
-        uses: lsst-sqre/build-and-publish-to-pypi@v1
+        uses: lsst-sqre/build-and-publish-to-pypi@v2
         with:
           pypi-token: ""
           python-version: "3.11"
