@@ -6,6 +6,6 @@ help:
 .PHONY: init
 init:
 	pip install -e ".[aiohttp,httpx,dev]"
-	pip install -U tox pre-commit
+	pip install -U tox pre-commit scriv
 	pre-commit install
 	rm -rf .tox
