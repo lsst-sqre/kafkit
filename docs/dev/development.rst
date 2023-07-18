@@ -99,29 +99,17 @@ Updating the change log
 =======================
 
 Each pull request should update the change log (:file:`CHANGELOG.md`).
-Add a description of new features and fixes as list items under a section at the top of the change log called "Unreleased:"
+The change log is maintained with scriv_.
 
-.. code-block:: md
+To create a new change log fragment, run:
 
-   ## Unreleased
+.. code-block:: sh
 
-   - Description of the feature or fix.
+   scriv create
 
-If the next version is known (because Kafkit's main branch is being prepared for a new major or minor version), the section may contain that version information:
-
-.. code-block:: md
-
-   ## X.Y.0 (unreleased)
-
-   - Description of the feature or fix.
-
-If the exact version and release date is known (:doc:`because a release is being prepared <release>`), the section header is formatted as:
-
-.. code-block:: rst
-
-   ## X.Y.0 (YYYY-MM-DD)
-
-   - Description of the feature or fix.
+This creates a new file in the :file:`changelog.d` directory.
+Edit this file to describe the changes in the pull request.
+If sections don't apply to the change you can delete them.
 
 .. _style-guide:
 

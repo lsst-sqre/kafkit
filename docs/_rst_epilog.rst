@@ -10,3 +10,4 @@
 .. _Schema Evolution and Compatibility: https://docs.confluent.io/current/schema-registry/avro.html
 .. _Strimzi: https://strimzi.io
 .. _tox: https://tox.readthedocs.io/en/latest/
+.. _scriv: https://scriv.readthedocs.io/en/latest/
