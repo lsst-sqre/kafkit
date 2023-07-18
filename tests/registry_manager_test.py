@@ -42,5 +42,8 @@ async def test_recordnameschemamanager() -> None:
         assert isinstance(data_b, bytes)
 
         # Sanity check that you can't serialize with the wrong schema!
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match=("Cannot serialize data with schema kafkit.a"),
+        ):
             await manager.serialize(data=topic_b_message, name="kafkit.a")

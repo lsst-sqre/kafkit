@@ -9,7 +9,7 @@ __all__ = [
     "UnmanagedSchemaError",
 ]
 
-from typing import Any, Optional
+from typing import Any
 
 
 class RegistryError(Exception):
@@ -37,8 +37,8 @@ class RegistryHttpError(RegistryError):
         self,
         status_code: int,
         *args: Any,
-        error_code: Optional[int] = None,
-        message: Optional[str] = None,
+        error_code: int | None = None,
+        message: str | None = None,
     ) -> None:
         self.status_code = status_code
         self.error_code = error_code

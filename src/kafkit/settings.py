@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class KafkaSecurityProtocol(str, Enum):
+class KafkaSecurityProtocol(Enum):
     """Kafka security protocols understood by aiokafka."""
 
     PLAINTEXT = "PLAINTEXT"
@@ -27,7 +27,7 @@ class KafkaSecurityProtocol(str, Enum):
     """TLS-encrypted connection."""
 
 
-class KafkaSaslMechanism(str, Enum):
+class KafkaSaslMechanism(Enum):
     """Kafka SASL mechanisms understood by aiokafka."""
 
     PLAIN = "PLAIN"
@@ -171,11 +171,6 @@ class KafkaConnectionSettings(BaseSettings):
         ):
             return None
 
-        # For type checking
-        assert self.client_cert_path is not None
-        assert self.cluster_ca_path is not None
-        assert self.client_key_path is not None
-
         client_cert_path = Path(self.client_cert_path)
 
         if self.client_ca_path is not None:
@@ -188,10 +183,7 @@ class KafkaConnectionSettings(BaseSettings):
                 )
             client_ca = Path(self.client_ca_path).read_text()
             client_cert = Path(self.client_cert_path).read_text()
-            if client_ca.endswith("\n"):
-                sep = ""
-            else:
-                sep = "\n"
+            sep = "" if client_ca.endswith("\n") else "\n"
             new_client_cert = sep.join([client_cert, client_ca])
             new_client_cert_path = Path(self.cert_temp_dir) / "client.crt"
             new_client_cert_path.write_text(new_client_cert)

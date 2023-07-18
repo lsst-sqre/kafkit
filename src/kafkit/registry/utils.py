@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 __all__ = ["get_avro_fqn"]
 
@@ -34,5 +35,4 @@ def get_avro_fqn(schema: Mapping[str, Any]) -> str:
         fqn = ".".join((schema["namespace"], schema["name"]))
     else:
         fqn = schema["name"]
-    assert isinstance(fqn, str)
     return fqn

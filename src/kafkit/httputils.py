@@ -6,7 +6,7 @@ This code is based on on the sans-io code of Gidgethub
 
 import cgi
 import urllib.parse
-from typing import Mapping, Optional, Tuple
+from collections.abc import Mapping
 
 import uritemplate
 
@@ -39,8 +39,8 @@ def format_url(*, host: str, url: str, url_vars: Mapping[str, str]) -> str:
 
 
 def parse_content_type(
-    content_type: Optional[str],
-) -> Tuple[Optional[str], str]:
+    content_type: str | None,
+) -> tuple[str | None, str]:
     """Tease out the content-type and character encoding.
 
     A default character encoding of UTF-8 is used, so the content-type

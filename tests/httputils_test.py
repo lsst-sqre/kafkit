@@ -1,6 +1,5 @@
 """Tests for the kafkit.utils module."""
 
-from typing import Dict
 
 import pytest
 
@@ -8,7 +7,7 @@ from kafkit.httputils import format_url
 
 
 @pytest.mark.parametrize(
-    "host,url,url_vars,expected",
+    ("host", "url", "url_vars", "expected"),
     [
         (
             "http://confluent-kafka-cp-schema-registry:8081",
@@ -37,7 +36,7 @@ from kafkit.httputils import format_url
     ],
 )
 def test_format_url(
-    host: str, url: str, url_vars: Dict[str, str], expected: str
+    host: str, url: str, url_vars: dict[str, str], expected: str
 ) -> None:
     """Test `kafkit.httputils.format_url`."""
     assert expected == format_url(host=host, url=url, url_vars=url_vars)

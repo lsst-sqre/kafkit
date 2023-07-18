@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any
 
 from kafkit.registry.serializer import PolySerializer
 
@@ -83,7 +83,7 @@ class RecordNameSchemaManager:
         self._logger = logging.getLogger(__name__)
 
         self._serializer = PolySerializer(registry=self._registry)
-        self.schemas: Dict[str, Any] = {}
+        self.schemas: dict[str, Any] = {}
 
         self._load_schemas()
 
@@ -102,7 +102,7 @@ class RecordNameSchemaManager:
             self.schemas[fqn] = schema
 
     async def register_schemas(
-        self, *, compatibility: Optional[str] = None
+        self, *, compatibility: str | None = None
     ) -> None:
         """Register all local schemas with the Confluent Schema Registry.
 
@@ -176,8 +176,11 @@ class RecordNameSchemaManager:
 
         schema = self.schemas[name]
 
-        encoded_message = await self._serializer.serialize(
-            data, schema=schema, subject=name
-        )
-
-        return encoded_message
+        try:
+            return await self._serializer.serialize(
+                data, schema=schema, subject=name
+            )
+        except ValueError as e:
+            raise ValueError(
+                f"Cannot serialize data with schema {name}"
+            ) from e
