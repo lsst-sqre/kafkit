@@ -14,8 +14,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Intended Audience :: Developers",
@@ -23,7 +21,7 @@ classifiers = [
     "Operating System :: POSIX",
     "Typing :: Typed",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = ["fastavro", "uritemplate"]
 dynamic = ["version"]
 
@@ -83,7 +81,7 @@ exclude_lines = [
 
 [tool.black]
 line-length = 79
-target-version = ['py38']
+target-version = ['py310']
 exclude = '''
 /(
     \.eggs
