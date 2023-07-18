@@ -43,8 +43,8 @@ Pre-commit hooks
 The pre-commit hooks, which are automatically installed by running the :command:`make init` command on :ref:`set up <dev-environment>`, ensure that files are valid and properly formatted.
 Some pre-commit hooks automatically reformat code:
 
-``isort``
-    Automatically sorts imports in Python modules.
+``ruff``
+    Automatically fixes common issues in code and sorts imports.
 
 ``black``
     Automatically formats Python code.
@@ -131,7 +131,7 @@ Style guide
 Code
 ----
 
-- The code style follows :pep:`8`, though in practice lean on Black and isort to format the code for you.
+- The code style follows :pep:`8`, though in practice lean on Black and ruff to format the code for you.
 
 - Use :pep:`484` type annotations.
   The ``tox -e typing`` test environment, which runs mypy_, ensures that the project's types are consistent.
