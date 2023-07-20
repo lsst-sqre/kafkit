@@ -26,11 +26,16 @@ Release tags are semantic version identifiers following the :pep:`440` specifica
 1. Change log and documentation
 -------------------------------
 
-Each PR should include updates to the change log.
+Each PR should include updates to the change log as scriv_ fragments (see :ref:`dev-change-log`).
+When a release is being made, collect these fragments into the change log by running:
+
+.. code-block:: sh
+
+   scriv collect --version "X.Y.Z"
+
 If the change log or documentation needs additional updates, now is the time to make those changes through the regular branch-and-PR development method against the ``main`` branch.
 
-In particular, replace the "Unreleased" section headline with the semantic version and date.
-See :ref:`dev-change-log` in the *Developer guide* for details.
+Each PR should have already created scriv_ change log fragments.
 
 2. Tag the release
 ------------------

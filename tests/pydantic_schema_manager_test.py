@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional
 
 import pytest
 from dataclasses_avroschema.avrodantic import AvroBaseModel
@@ -22,14 +21,14 @@ def current_datetime() -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
-class SlackMessageType(str, Enum):
+class SlackMessageType(Enum):
     """The type of Slack message."""
 
     app_mention = "app_mention"
     message = "message"
 
 
-class SlackChannelType(str, Enum):
+class SlackChannelType(Enum):
     """The type of Slack channel."""
 
     channel = "channel"  # public channel
@@ -54,7 +53,7 @@ class SquarebotMessage(AvroBaseModel):
         description="The type of channel (public, direct im, etc..)"
     )
 
-    user: Optional[str] = Field(
+    user: str | None = Field(
         description="The ID of the user that sent the message (eg U061F7AUR)."
     )
 

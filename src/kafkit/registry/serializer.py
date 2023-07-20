@@ -7,7 +7,7 @@ from __future__ import annotations
 import struct
 from dataclasses import dataclass
 from io import BytesIO
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 import fastavro
 
@@ -71,7 +71,7 @@ class Serializer:
     https://aiokafka.readthedocs.io/en/stable/examples/serialize_and_compress.html
     """
 
-    def __init__(self, *, schema: Dict[str, Any], schema_id: int) -> None:
+    def __init__(self, *, schema: dict[str, Any], schema_id: int) -> None:
         self.schema = fastavro.parse_schema(schema)
         self.id = schema_id
 
@@ -80,8 +80,8 @@ class Serializer:
         cls,
         *,
         registry: RegistryApi,
-        schema: Dict[str, Any],
-        subject: Optional[str] = None,
+        schema: dict[str, Any],
+        subject: str | None = None,
     ) -> Serializer:
         """Create a serializer ensuring that the schema is registered with the
         schema registry.
@@ -147,9 +147,9 @@ class PolySerializer:
     async def serialize(
         self,
         data: Any,
-        schema: Optional[Dict[str, Any]] = None,
-        schema_id: Optional[int] = None,
-        subject: Optional[str] = None,
+        schema: dict[str, Any] | None = None,
+        schema_id: int | None = None,
+        subject: str | None = None,
     ) -> bytes:
         """Serialize data given a schema.
 
@@ -194,7 +194,7 @@ class PolySerializer:
 
 
 def _make_message(
-    *, schema_id: int, schema: Dict[str, Any], data: Any
+    *, schema_id: int, schema: dict[str, Any], data: Any
 ) -> bytes:
     """Make a message in the Confluent Wire Format."""
     message_fh = BytesIO()
@@ -348,7 +348,7 @@ def pack_wire_format_prefix(schema_id: int) -> bytes:
     return struct.pack(">bI", 0, schema_id)
 
 
-def unpack_wire_format_data(data: bytes) -> Tuple[int, bytes]:
+def unpack_wire_format_data(data: bytes) -> tuple[int, bytes]:
     """Unpackage the bytes of a Confluent Wire Format message to get the
     schema ID and message body.
 
@@ -373,7 +373,7 @@ def unpack_wire_format_data(data: bytes) -> Tuple[int, bytes]:
     """
     if len(data) < 5:
         raise RuntimeError(
-            f"Data is too short, length is {len(data)} " "bytes. Must be >= 5."
+            f"Data is too short, length is {len(data)} bytes. Must be >= 5."
         )
     prefix = data[:5]
 

@@ -3,7 +3,6 @@ for serializing Pydantic models into Avro.
 """
 
 from collections.abc import Iterable
-from typing import Type
 
 from dataclasses_avroschema.avrodantic import AvroBaseModel
 from httpx import AsyncClient
@@ -30,7 +29,7 @@ class PydanticSchemaManagerDependency:
         *,
         http_client: AsyncClient,
         registry_url: str,
-        models: Iterable[Type[AvroBaseModel]],
+        models: Iterable[type[AvroBaseModel]],
         suffix: str = "",
         compatibility: str = "FORWARD",
     ) -> None:

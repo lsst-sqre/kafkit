@@ -5,8 +5,9 @@ of schemas.
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Iterable, Optional, Type
+from typing import TYPE_CHECKING, Any
 
 from dataclasses_avroschema.avrodantic import AvroBaseModel
 
@@ -28,7 +29,7 @@ class CachedSchema:
     schema: dict[str, Any]
     """The Avro schema derived from the model."""
 
-    model: Type[AvroBaseModel]
+    model: type[AvroBaseModel]
     """The Pydantic model."""
 
 
@@ -66,8 +67,8 @@ class PydanticSchemaManager:
 
     async def register_models(
         self,
-        models: Iterable[Type[AvroBaseModel]],
-        compatibility: Optional[str] = None,
+        models: Iterable[type[AvroBaseModel]],
+        compatibility: str | None = None,
     ) -> None:
         """Register the models with the registry.
 
@@ -80,7 +81,7 @@ class PydanticSchemaManager:
             await self.register_model(model, compatibility=compatibility)
 
     async def register_model(
-        self, model: Type[AvroBaseModel], compatibility: Optional[str] = None
+        self, model: type[AvroBaseModel], compatibility: str | None = None
     ) -> None:
         """Register the model with the registry.
 
@@ -156,7 +157,7 @@ class PydanticSchemaManager:
         return cached_model.model.parse_obj(message_info.message)
 
     def _cache_model(
-        self, model: AvroBaseModel | Type[AvroBaseModel]
+        self, model: AvroBaseModel | type[AvroBaseModel]
     ) -> CachedSchema:
         schema_fqn = self._get_model_fqn(model)
         avro_schema = model.avro_schema_to_python()
@@ -171,18 +172,18 @@ class PydanticSchemaManager:
         return self._models[schema_fqn]
 
     def _get_model_fqn(
-        self, model: AvroBaseModel | Type[AvroBaseModel]
+        self, model: AvroBaseModel | type[AvroBaseModel]
     ) -> str:
         # Mypy can't detect the Meta class on the model, so we have to ignore
         # those lines.
 
         try:
-            name = model.Meta.schema_name  # type: ignore
+            name = model.Meta.schema_name  # type: ignore [union-attr]
         except AttributeError:
             name = model.__class__.__name__
 
         try:
-            namespace = model.Meta.namespace  # type: ignore
+            namespace = model.Meta.namespace  # type: ignore [union-attr]
         except AttributeError:
             namespace = None
 
