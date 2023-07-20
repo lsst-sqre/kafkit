@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 import pytest
@@ -18,7 +18,7 @@ from kafkit.registry.manager import PydanticSchemaManager
 
 def current_datetime() -> datetime:
     """Return the current datetime."""
-    return datetime.now(tz=UTC)
+    return datetime.now(tz=timezone.utc)
 
 
 class SlackMessageType(Enum):
