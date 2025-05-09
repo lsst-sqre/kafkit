@@ -4,9 +4,9 @@ This code is based on on the sans-io code of Gidgethub
 (https://github.com/brettcannon/gidgethub) and generalized for Kafkit.
 """
 
-import cgi
 import urllib.parse
-from typing import Mapping, Optional, Tuple
+from collections.abc import Mapping, Optional, Tuple
+from email.message import Message
 
 import uritemplate
 
@@ -50,6 +50,6 @@ def parse_content_type(
     if content_type is None:
         return None, "utf-8"
     else:
-        type_, parameters = cgi.parse_header(content_type)
-        encoding = parameters.get("charset", "utf-8")
-        return type_, encoding
+        m = Message()
+        m["content-type"] = content_type
+        return m.get_content_type(), m.get_param("charset", "utf-8")
