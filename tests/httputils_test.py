@@ -1,6 +1,5 @@
 """Tests for the kafkit.utils module."""
 
-
 import pytest
 
 from kafkit.httputils import format_url
