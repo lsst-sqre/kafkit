@@ -64,7 +64,7 @@ async def test_serializer() -> None:
     unpacked_schema = client.schema_cache[unpacked_id]
     message_fh = BytesIO(unpacked_body)
     message_fh.seek(0)
-    unpacked_message = fastavro.schemaless_reader(message_fh, unpacked_schema)
+    unpacked_message = fastavro.schemaless_reader(message_fh, unpacked_schema)  # type: ignore[call-arg]
     assert unpacked_message == message
 
 

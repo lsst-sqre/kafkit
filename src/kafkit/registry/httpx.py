@@ -6,7 +6,7 @@ See licenses/gidgethub.txt for info.
 
 from __future__ import annotations
 
-from typing import Mapping, Tuple
+from collections.abc import Mapping
 
 from httpx import AsyncClient
 
@@ -30,7 +30,7 @@ class RegistryApi(sansio.RegistryApi):
 
     async def _request(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes
-    ) -> Tuple[int, Mapping[str, str], bytes]:
+    ) -> tuple[int, Mapping[str, str], bytes]:
         response = await self._client.request(
             method, url, headers=headers, content=body
         )

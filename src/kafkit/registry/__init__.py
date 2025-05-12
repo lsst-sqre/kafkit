@@ -13,11 +13,11 @@ from kafkit.registry.serializer import Deserializer, PolySerializer, Serializer
 
 __all__ = [
     "Deserializer",
-    "Serializer",
     "PolySerializer",
     "RegistryBadRequestError",
     "RegistryBrokenError",
     "RegistryError",
     "RegistryHttpError",
     "RegistryRedirectionError",
+    "Serializer",
 ]

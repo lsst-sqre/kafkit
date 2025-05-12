@@ -344,8 +344,8 @@ def test_schema_cache() -> None:
     with pytest.raises(KeyError):
         cache[0]
     with pytest.raises(KeyError):
-        schemaX = {"type": "unknown"}
-        cache[schemaX]
+        schema_x = {"type": "unknown"}
+        cache[schema_x]
 
 
 def test_subject_cache() -> None:
@@ -394,11 +394,11 @@ def test_subject_cache() -> None:
     assert cache.get_schema("schema2", 32)["name"] == "test-schemas.schema2"
 
     # Test inserting a subject that does not have a pre-cached schema
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         cache.insert("schema3", 13)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         cache.insert("schema3", 13, schema_id=3)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         cache.insert("schema3", 13, schema=schema3)
     cache.insert("schema3", 13, schema=schema3, schema_id=3)
     assert ("schema3", 13) in cache
@@ -406,13 +406,13 @@ def test_subject_cache() -> None:
     assert cache.get_schema("schema3", 13)["name"] == "test-schemas.schema3"
 
     # Test getting a non-existent subject or version
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         cache.get_id("schema3", 25)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         cache.get_schema("schema18", 25)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         cache.get("schema18", 15)
 
     # Test caching 'latest'
     with pytest.raises(TypeError):
-        cache.insert("mysubject", "latest", schema_id=42)  # type: ignore
+        cache.insert("mysubject", "latest", schema_id=42)  # type: ignore[arg-type]
