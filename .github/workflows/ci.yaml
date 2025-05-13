@@ -17,6 +17,8 @@ env:
     tags:
       - "*"
   pull_request: {}
+  release:
+    types: [published]
 
 jobs:
   lint:
