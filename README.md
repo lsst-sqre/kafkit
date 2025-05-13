@@ -1,5 +1,14 @@
 # Kafkit
 
+> [!IMPORTANT]
+> This package has been deprecated by the SQuaRE team and will only receive maintenance updates on the 0.3 branch. Kafkit is superseded by the following packages:
+>
+> - [safir.kafka](https://safir.lsst.io/user-guide/kafka/index.html) provides a Schema Manager for Pydantic models that integrates with the Confluent Schema Registry.
+> - [dataclasses-avroschema](https://github.com/marcosschroh/dataclasses-avroschema) from Marcos Schroh provides core support for integrating Avro with Python dataclasses and Pydantic models.
+> - [python-schema-registry-client](https://github.com/marcosschroh/python-schema-registry-client) also from Marcos Schroh provides a client for the Confluent Schema Registry.
+
+---
+
 Kafkit helps you write Kafka producers and consumers in Python with asyncio:
 
 - Kafkit provides a client for the Confluent Schema Registry's HTTP API.
