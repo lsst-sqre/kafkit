@@ -1,5 +1,20 @@
 # Change log
 
+<!-- scriv-insert-here -->
+
+<a id='changelog-0.3.1'></a>
+
+## 0.3.1 (2025-05-13)
+
+### Bug fixes
+
+- Fixes compatibility with Python 3.13 by replacing use of the `cgi` module with `email.message` for parsing headers.
+
+### Other changes
+
+- Adopt ruff for formatting and linting.
+- Update GitHub Actions.
+
 ## 0.3.0 (2023-02-23)
 
 New features:

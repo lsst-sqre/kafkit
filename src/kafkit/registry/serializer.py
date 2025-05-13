@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import struct
 from io import BytesIO
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 import fastavro
 
@@ -14,9 +14,9 @@ if TYPE_CHECKING:
     from kafkit.registry.sansio import RegistryApi
 
 __all__ = [
-    "Serializer",
-    "PolySerializer",
     "Deserializer",
+    "PolySerializer",
+    "Serializer",
 ]
 
 
@@ -47,29 +47,27 @@ class Serializer:
     For demonstration purposes, assume the schema is already cached:
 
     >>> schema = {
-    ...    'type': 'record',
-    ...    'name': 'schema1',
-    ...    'namespace': 'test-schemas',
-    ...    'fields': [
-    ...        {'name': 'a', 'type': 'int'},
-    ...        {'name': 'b', 'type': 'string'}
-    ...    ]
+    ...     "type": "record",
+    ...     "name": "schema1",
+    ...     "namespace": "test-schemas",
+    ...     "fields": [
+    ...         {"name": "a", "type": "int"},
+    ...         {"name": "b", "type": "string"},
+    ...     ],
     ... }
     >>> client.schemas.insert(schema, 1)
-    >>> serializer = await Serializer.register(
-    ...     registry=client,
-    ...     schema=schema)
+    >>> serializer = await Serializer.register(registry=client, schema=schema)
 
     Serialize messages:
 
-    >>> data = serializer({'a': 42, 'b': 'Hello world!'})
+    >>> data = serializer({"a": 42, "b": "Hello world!"})
 
     This serializer works well as ``key_serializer`` or ``value_serializer``
     parameters to the `aiokafka.AIOKafkaProducer`. See
     https://aiokafka.readthedocs.io/en/stable/examples/serialize_and_compress.html
     """
 
-    def __init__(self, *, schema: Dict[str, Any], schema_id: int) -> None:
+    def __init__(self, *, schema: dict[str, Any], schema_id: int) -> None:
         self.schema = fastavro.parse_schema(schema)
         self.id = schema_id
 
@@ -78,8 +76,8 @@ class Serializer:
         cls,
         *,
         registry: RegistryApi,
-        schema: Dict[str, Any],
-        subject: Optional[str] = None,
+        schema: dict[str, Any],
+        subject: str | None = None,
     ) -> Serializer:
         """Create a serializer ensuring that the schema is registered with the
         schema registry.
@@ -126,7 +124,8 @@ class Serializer:
         message : `bytes`
             Message in the Confluent Schema Registry wire format.
         """
-        return _make_message(data=data, schema_id=self.id, schema=self.schema)
+        schema = dict(self.schema)  # type: ignore[arg-type]
+        return _make_message(data=data, schema_id=self.id, schema=schema)
 
 
 class PolySerializer:
@@ -145,9 +144,9 @@ class PolySerializer:
     async def serialize(
         self,
         data: Any,
-        schema: Optional[Dict[str, Any]] = None,
-        schema_id: Optional[int] = None,
-        subject: Optional[str] = None,
+        schema: dict[str, Any] | None = None,
+        schema_id: int | None = None,
+        subject: str | None = None,
     ) -> bytes:
         """Serialize data given a schema.
 
@@ -192,7 +191,7 @@ class PolySerializer:
 
 
 def _make_message(
-    *, schema_id: int, schema: Dict[str, Any], data: Any
+    *, schema_id: int, schema: dict[str, Any], data: Any
 ) -> bytes:
     """Make a message in the Confluent Wire Format."""
     message_fh = BytesIO()
@@ -247,8 +246,8 @@ class Deserializer:
         self._registry = registry
 
     async def deserialize(
-        self, data: bytes, include_schema: bool = False
-    ) -> Dict[str, Any]:
+        self, data: bytes, *, include_schema: bool = False
+    ) -> dict[str, Any]:
         """Deserialize a message.
 
         Parameters
@@ -282,7 +281,7 @@ class Deserializer:
 
         message_fh = BytesIO(message_data)
         message_fh.seek(0)
-        message = fastavro.schemaless_reader(message_fh, schema)
+        message = fastavro.schemaless_reader(message_fh, schema)  # type: ignore[call-arg]
         result = {"id": schema_id, "message": message}
         if include_schema:
             result["schema"] = schema
@@ -313,7 +312,7 @@ def pack_wire_format_prefix(schema_id: int) -> bytes:
     return struct.pack(">bI", 0, schema_id)
 
 
-def unpack_wire_format_data(data: bytes) -> Tuple[int, bytes]:
+def unpack_wire_format_data(data: bytes) -> tuple[int, bytes]:
     """Unpackage the bytes of a Confluent Wire Format message to get the
     schema ID and message body.
 
@@ -338,7 +337,7 @@ def unpack_wire_format_data(data: bytes) -> Tuple[int, bytes]:
     """
     if len(data) < 5:
         raise RuntimeError(
-            f"Data is too short, length is {len(data)} " "bytes. Must be >= 5."
+            f"Data is too short, length is {len(data)} bytes. Must be >= 5."
         )
     prefix = data[:5]
 

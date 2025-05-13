@@ -1,14 +1,16 @@
 """Exceptions classes for the Registry client."""
 
+from __future__ import annotations
+
 __all__ = [
+    "RegistryBadRequestError",
+    "RegistryBrokenError",
     "RegistryError",
     "RegistryHttpError",
     "RegistryRedirectionError",
-    "RegistryBadRequestError",
-    "RegistryBrokenError",
 ]
 
-from typing import Any, Optional
+from typing import Any
 
 
 class RegistryError(Exception):
@@ -20,14 +22,14 @@ class RegistryHttpError(RegistryError):
 
     Parameters
     ----------
-    status_code : `int`
+    status_code
         The HTTP status code.
     *args
         A custom, arbitrary, error message. Setting this overrides ``message``.
-    error_code : `int`, optional
+    error_code
         The Confluent Schema Registry error code. See
         https://docs.confluent.io/current/schema-registry/docs/api.html#errors
-    message : `str`, optional
+    message
         The error message, intended to be the ``message`` field in Schema
         Registry error responses.
     """
@@ -36,8 +38,8 @@ class RegistryHttpError(RegistryError):
         self,
         status_code: int,
         *args: Any,
-        error_code: Optional[int] = None,
-        message: Optional[str] = None,
+        error_code: int | None = None,
+        message: str | None = None,
     ) -> None:
         self.status_code = status_code
         self.error_code = error_code

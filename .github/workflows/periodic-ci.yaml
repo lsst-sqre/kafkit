@@ -4,6 +4,9 @@
 
 name: Periodic CI
 
+env:
+  PYTHON_VERSION: "3.13"
+
 "on":
   schedule:
     - cron: "0 12 * * 1"
@@ -15,13 +18,12 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.8"
-          - "3.9"
-          - "3.10"
           - "3.11"
+          - "3.12"
+          - "3.13"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run tests in tox
         uses: lsst-sqre/run-tox@v1
@@ -34,12 +36,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build docs in tox
         uses: lsst-sqre/run-tox@v1
         with:
-          python-version: "3.10"
+          python-version: ${{ env.PYTHON_VERSION }}
           tox-envs: "docs,docs-linkcheck"
           use-cache: false
 
@@ -47,13 +49,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # full history for setuptools_scm
 
       - name: Build and publish
-        uses: lsst-sqre/build-and-publish-to-pypi@v1
+        uses: lsst-sqre/build-and-publish-to-pypi@v2
         with:
-          pypi-token: ""
-          python-version: "3.10"
+          python-version: ${{ env.PYTHON_VERSION }}
           upload: false

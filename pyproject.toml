@@ -3,7 +3,8 @@
 name = "kafkit"
 readme = "README.md"
 description = "Kafkit helps you write Kafka producers and consumers in Python with asyncio."
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Association of Universities for Research in Astronomy, Inc. (AURA)", email = "sqre-admin@lists.lsst.org" },
 ]
@@ -11,12 +12,11 @@ keywords = ["rubin", "lsst"]
 # https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Operating System :: POSIX",
@@ -80,46 +80,22 @@ exclude_lines = [
 
 [tool.black]
 line-length = 79
-target-version = ['py38']
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | build
-  | dist
-)/
-'''
-# Use single-quoted strings so TOML treats the string like a Python r-string
-# Multi-line strings are implicitly treated by black as regular expressions
+target-version = ["py313"]
 
-[tool.pydocstyle]
-# Reference: http://www.pydocstyle.org/en/stable/error_codes.html
-convention = "numpy"
-add_select = [
-    "D212", # Multi-line docstring summary should start at the first line
-]
-add-ignore = [
-    "D105", # Missing docstring in magic method
-    "D102", # Missing docstring in public method (needed for docstring inheritance)
-    "D100", # Missing docstring in public module
-    # Below are required to allow multi-line summaries.
-    "D200", # One-line docstring should fit on one line with quotes
-    "D205", # 1 blank line required between summary line and description
-    "D400", # First line should end with a period
-    # Properties shouldn't be written in imperative mode. This will be fixed
-    # post 6.1.1, see https://github.com/PyCQA/pydocstyle/pull/546
-    "D401",
+# Use the generic Ruff configuration in ruff.toml and extend it with only
+# project-specific settings. Add a [tool.ruff.lint.extend-per-file-ignores]
+# section for project-specific ignore rules.
+[tool.ruff]
+extend = "ruff-shared.toml"
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/*" = [
+    "T201", # Allow print in tests
 ]
 
-[tool.isort]
-profile = "black"
-line_length = 79
-known_first_party = "kafkit"
-skip = ["docs/conf.py"]
+[tool.ruff.lint.isort]
+known-first-party = ["kafkit", "tests"]
+split-on-trailing-comma = false
 
 [tool.pytest]
 
@@ -138,3 +114,16 @@ strict_equality = true
 warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_ignores = true
+
+[tool.scriv]
+categories = [
+    "Backwards-incompatible changes",
+    "New features",
+    "Bug fixes",
+    "Other changes",
+]
+entry_title_template = "{{ version }} ({{ date.strftime('%Y-%m-%d') }})"
+format = "md"
+md_header_level = "2"
+new_fragment_template = "file:changelog.d/_template.md"
+skip_fragments = "_template.md"

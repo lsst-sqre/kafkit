@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional
+from typing import TYPE_CHECKING, Any
 
 from kafkit.registry.errors import RegistryBadRequestError
 from kafkit.registry.sansio import CompatibilityType
@@ -80,7 +81,7 @@ class RecordNameSchemaManager:
         self._suffix = suffix
 
         self._serializer = PolySerializer(registry=self._registry)
-        self.schemas: Dict[str, Any] = {}
+        self.schemas: dict[str, Any] = {}
 
         self._load_schemas()
 
@@ -93,7 +94,7 @@ class RecordNameSchemaManager:
             schema = json.loads(schema_path.read_text())
 
             if self._suffix:
-                schema["name"] = f'{schema["name"]}{self._suffix}'
+                schema["name"] = f"{schema['name']}{self._suffix}"
 
             fqn = self._get_fqn(schema)
             self.schemas[fqn] = schema
@@ -126,11 +127,10 @@ class RecordNameSchemaManager:
             fqn = ".".join((schema["namespace"], schema["name"]))
         else:
             fqn = schema["name"]
-        assert isinstance(fqn, str)
         return fqn
 
     async def register_schemas(
-        self, *, compatibility: Optional[str] = None
+        self, *, compatibility: str | None = None
     ) -> None:
         """Register all local schemas with the Confluent Schema Registry.
 
@@ -163,11 +163,11 @@ class RecordNameSchemaManager:
         if isinstance(compatibility, str):
             try:
                 CompatibilityType[compatibility]
-            except KeyError:
+            except KeyError as e:
                 raise ValueError(
                     f"Compatibility setting {compatibility!r} is not in the "
                     f"allowed set: {[v.value for v in CompatibilityType]}"
-                )
+                ) from e
         for subject_name, schema in self.schemas.items():
             await self._register_schema(
                 subject_name=subject_name,
@@ -179,10 +179,10 @@ class RecordNameSchemaManager:
         self,
         *,
         subject_name: str,
-        schema: Dict[str, Any],
-        desired_compatibility: Optional[str],
+        schema: dict[str, Any],
+        desired_compatibility: str | None,
     ) -> int:
-        """Register a schema with the Schema Registry
+        """Register a schema with the Schema Registry.
 
         Parameters
         ----------
@@ -298,8 +298,6 @@ class RecordNameSchemaManager:
 
         schema = self.schemas[name]
 
-        encoded_message = await self._serializer.serialize(
+        return await self._serializer.serialize(
             data, schema=schema, subject=name
         )
-
-        return encoded_message

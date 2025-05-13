@@ -6,7 +6,8 @@ See licenses/gidgethub.txt for info.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping, Tuple
+from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from kafkit.registry import sansio
 
@@ -33,7 +34,7 @@ class RegistryApi(sansio.RegistryApi):
 
     async def _request(
         self, method: str, url: str, headers: Mapping[str, str], body: bytes
-    ) -> Tuple[int, Mapping[str, str], bytes]:
+    ) -> tuple[int, Mapping[str, str], bytes]:
         async with self._session.request(
             method, url, headers=headers, data=body
         ) as response:
