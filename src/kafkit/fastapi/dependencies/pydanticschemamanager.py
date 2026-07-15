@@ -11,8 +11,8 @@ from kafkit.registry import manager  # this is patched in tests
 from kafkit.registry.httpx import RegistryApi
 
 __all__ = [
-    "pydantic_schema_manager_dependency",
     "PydanticSchemaManagerDependency",
+    "pydantic_schema_manager_dependency",
 ]
 
 

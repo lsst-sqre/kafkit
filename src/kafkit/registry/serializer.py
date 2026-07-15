@@ -15,10 +15,10 @@ if TYPE_CHECKING:
     from kafkit.registry.sansio import RegistryApi
 
 __all__ = [
-    "Serializer",
-    "PolySerializer",
     "Deserializer",
     "MessageInfo",
+    "PolySerializer",
+    "Serializer",
 ]
 
 

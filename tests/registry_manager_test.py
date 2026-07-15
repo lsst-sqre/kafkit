@@ -1,6 +1,7 @@
 """Tests for the kafkit.registry.manager module."""
 
 import os
+import re
 from pathlib import Path
 
 import pytest
@@ -44,6 +45,6 @@ async def test_recordnameschemamanager() -> None:
         # Sanity check that you can't serialize with the wrong schema!
         with pytest.raises(
             ValueError,
-            match=("Cannot serialize data with schema kafkit.a"),
+            match=re.escape("Cannot serialize data with schema kafkit.a"),
         ):
             await manager.serialize(data=topic_b_message, name="kafkit.a")

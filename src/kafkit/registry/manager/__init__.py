@@ -5,4 +5,4 @@ serialization and deserialization of messages.
 from ._pydantic import PydanticSchemaManager
 from ._recordname import RecordNameSchemaManager
 
-__all__ = ["RecordNameSchemaManager", "PydanticSchemaManager"]
+__all__ = ["PydanticSchemaManager", "RecordNameSchemaManager"]

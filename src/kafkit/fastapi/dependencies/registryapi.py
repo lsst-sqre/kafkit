@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 from kafkit.registry.httpx import RegistryApi
 
-__all__ = ["registry_api_dependency", "RegistryApiDependency"]
+__all__ = ["RegistryApiDependency", "registry_api_dependency"]
 
 
 class RegistryApiDependency:

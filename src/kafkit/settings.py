@@ -12,8 +12,8 @@ from .ssl import create_ssl_context
 
 __all__ = [
     "KafkaConnectionSettings",
-    "KafkaSecurityProtocol",
     "KafkaSaslMechanism",
+    "KafkaSecurityProtocol",
 ]
 
 

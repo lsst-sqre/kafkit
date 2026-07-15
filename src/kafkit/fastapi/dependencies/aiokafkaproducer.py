@@ -4,7 +4,7 @@ import aiokafka  # patched for testing
 
 from kafkit.settings import KafkaConnectionSettings
 
-__all__ = ["kafka_producer_dependency", "AioKafkaProducerDependency"]
+__all__ = ["AioKafkaProducerDependency", "kafka_producer_dependency"]
 
 
 class AioKafkaProducerDependency:

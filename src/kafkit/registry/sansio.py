@@ -28,14 +28,14 @@ from .errors import (
 )
 
 __all__ = [
-    "make_headers",
-    "decipher_response",
-    "decode_body",
-    "RegistryApi",
+    "CompatibilityType",
     "MockRegistryApi",
+    "RegistryApi",
     "SchemaCache",
     "SubjectCache",
-    "CompatibilityType",
+    "decipher_response",
+    "decode_body",
+    "make_headers",
 ]
 
 
@@ -644,7 +644,7 @@ class MockRegistryApi(RegistryApi):
     ) -> None:
         super().__init__(url=url)
         self.response_code = status_code
-        self.response_headers = headers if headers else self._default_headers
+        self.response_headers = headers or self._default_headers
         self.response_body = body
 
     async def _request(

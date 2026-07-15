@@ -401,12 +401,12 @@ def test_subject_cache() -> None:
         cache.insert("schema3", 13)
     with pytest.raises(
         ValueError,
-        match="^Trying to cache the schema ID for subject 'schema3'",
+        match=r"^Trying to cache the schema ID for subject 'schema3'",
     ):
         cache.insert("schema3", 13, schema_id=3)
     with pytest.raises(
         ValueError,
-        match="^Trying to cache the schema ID for subject 'schema3'",
+        match=r"^Trying to cache the schema ID for subject 'schema3'",
     ):
         cache.insert("schema3", 13, schema=schema3)
     cache.insert("schema3", 13, schema=schema3, schema_id=3)
@@ -417,17 +417,17 @@ def test_subject_cache() -> None:
     # Test getting a non-existent subject or version
     with pytest.raises(
         ValueError,
-        match="Schema with subject 'schema3' version 25 not cached.",
+        match=r"Schema with subject 'schema3' version 25 not cached.",
     ):
         cache.get_id("schema3", 25)
     with pytest.raises(
         ValueError,
-        match="Schema with subject 'schema18' version 25 not cached.",
+        match=r"Schema with subject 'schema18' version 25 not cached.",
     ):
         cache.get_schema("schema18", 25)
     with pytest.raises(
         ValueError,
-        match="Schema with subject 'schema18' version 15 not cached.",
+        match=r"Schema with subject 'schema18' version 15 not cached.",
     ):
         cache.get("schema18", 15)
 

@@ -20,12 +20,12 @@ from kafkit.registry.serializer import (
 __all__ = [
     "Deserializer",
     "MessageInfo",
-    "Serializer",
     "PolySerializer",
     "RegistryBadRequestError",
     "RegistryBrokenError",
     "RegistryError",
     "RegistryHttpError",
     "RegistryRedirectionError",
+    "Serializer",
     "UnmanagedSchemaError",
 ]

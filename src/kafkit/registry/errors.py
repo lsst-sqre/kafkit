@@ -1,11 +1,11 @@
 """Exceptions classes for the Registry client."""
 
 __all__ = [
+    "RegistryBadRequestError",
+    "RegistryBrokenError",
     "RegistryError",
     "RegistryHttpError",
     "RegistryRedirectionError",
-    "RegistryBadRequestError",
-    "RegistryBrokenError",
     "UnmanagedSchemaError",
 ]
 
