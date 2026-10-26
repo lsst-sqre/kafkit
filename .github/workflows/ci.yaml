@@ -54,6 +54,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    env:
+      HAS_OOK_TOKEN: ${{ secrets.OOK_TOKEN != '' }}
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -65,20 +73,20 @@ jobs:
       - name: Run tox
         uses: lsst-sqre/run-tox@v1
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           tox-envs: "docs,docs-linkcheck"
+        env:
+          OOK_TOKEN: ${{ secrets.OOK_TOKEN }}
 
-      # Only attempt documentation uploads for tagged releases and pull
-      # requests from ticket branches in the same repository.  This avoids
-      # version clutter in the docs and failures when a PR doesn't have access
-      # to secrets.
-      - name: Upload to LSST the Docs
-        uses: lsst-sqre/ltd-upload@v1
+      - name: Upload to Docverse
+        uses: lsst-sqre/docverse-upload@v1
         with:
+          org: rubin
           project: "kafkit"
           dir: "docs/_build/html"
-          username: ${{ secrets.LTD_USERNAME }}
-          password: ${{ secrets.LTD_PASSWORD }}
+          token: ${{ secrets.DOCVERSE_TOKEN }}
+          github-token: ${{ github.token }}
+          comment-on-pr: "true"
         if: >
           github.event_name != 'merge_group'
           && (github.event_name != 'pull_request'

@@ -39,7 +39,7 @@ dev = [
     "mypy",
     # Documentation
     "sphinx",
-    "documenteer[guide]",
+    "documenteer[guide]==2.5.0b4",
 ]
 
 [project.urls]
