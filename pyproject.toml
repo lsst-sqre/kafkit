@@ -37,14 +37,17 @@ dev = [
     "pytest-asyncio",
     "pre-commit",
     "mypy",
-    # Documentation
-    "sphinx",
-    "documenteer[guide]==2.5.0b4",
 ]
 
 [project.urls]
 Homepage = "https://kafkit.lsst.io"
 Source = "https://github.com/lsst-sqre/kafkit"
+
+[dependency-groups]
+docs = [
+    "sphinx",
+    "documenteer[guide]==2.5.0b4",
+]
 
 [build-system]
 requires = ["setuptools>=61", "wheel", "setuptools_scm[toml]>=6.2"]
